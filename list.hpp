@@ -89,9 +89,29 @@ public:
 	*/
 
 	~list() {
+		clear();
 		// TODO : clear list
 		_node_alloc.destroy(_sentinel_node);
 		_node_alloc.deallocate(_sentinel_node, 1);
+	}
+
+	bool empty() const {
+		return _sentinel_node->next == _sentinel_node;
+	}
+
+	size_type size() const {
+		node_pointer tmp = _sentinel_node->next;
+		size_type i = 0;
+
+		while (tmp != _sentinel_node) {
+			i++;
+			tmp = tmp->next;
+		}
+		return (i);
+	}
+
+	size_type max_size() const {
+		return _node_alloc.max_size();
 	}
 
 	void push_front(const value_type & val) {
@@ -110,10 +130,21 @@ public:
 		_delete(_sentinel_node->prev);
 	}
 
+	void clear() {
+		node_pointer tmp = _sentinel_node->next;
+		node_pointer next;
+
+		while (tmp != _sentinel_node) {
+			next = tmp->next;
+			_delete(tmp);
+			tmp = next;
+		}
+	}
+
 	// DEBUG
 
 	void print_list() {
-		DNode<T> * tmp = _sentinel_node->next;
+		node_pointer tmp = _sentinel_node->next;
 
 		//std::cout << "Sentinel " << _sentinel_node << ", prev: " << _sentinel_node->prev << ", next: " << _sentinel_node->next << std::endl;
 		std::cout << "LIST: " << std::endl;
@@ -126,7 +157,6 @@ public:
 
 private:
 	typedef typename allocator_type::template rebind<DNode<T>>::other node_alloc;
-	//typedef typename node_alloc::pointer node_pointer;
 	typedef DNode<T> * node_pointer;
 
 	allocator_type _alloc;
