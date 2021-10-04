@@ -2,13 +2,22 @@
 #define LIST_HPP
 
 #include <memory>
+#include "iterator.hpp"
 
 // DEBUG
 #include <iostream>
 
 namespace ft {
 
-// DOUBLY LINKED NODE TEMPLATE STRUCT
+/*
+
+██████  ███    ██  ██████  ██████  ███████
+██   ██ ████   ██ ██    ██ ██   ██ ██
+██   ██ ██ ██  ██ ██    ██ ██   ██ █████
+██   ██ ██  ██ ██ ██    ██ ██   ██ ██
+██████  ██   ████  ██████  ██████  ███████
+
+*/
 
 template <class T>
 struct DNode {
@@ -34,7 +43,99 @@ struct DNode {
 	{}
 };
 
-// LIST TEMPLATE CLASS
+/*
+
+██      ██ ███████ ████████ ██ ████████ ███████ ██████   █████  ████████  ██████  ██████
+██      ██ ██         ██    ██    ██    ██      ██   ██ ██   ██    ██    ██    ██ ██   ██
+██      ██ ███████    ██    ██    ██    █████   ██████  ███████    ██    ██    ██ ██████
+██      ██      ██    ██    ██    ██    ██      ██   ██ ██   ██    ██    ██    ██ ██   ██
+███████ ██ ███████    ██    ██    ██    ███████ ██   ██ ██   ██    ██     ██████  ██   ██
+
+*/
+
+template <class T>
+class ListIterator: public ft::iterator<ft::bidirectional_iterator_tag, T> {
+
+public:
+	ListIterator(): _node(NULL) {}
+
+	ListIterator(DNode<T> * node): _node(node) {}
+
+	ListIterator(ListIterator const & original): _node(original._node) {}
+
+	~ListIterator() {}
+
+	ListIterator & operator=(ListIterator const & rhs) {
+		if (*this == rhs) {
+			return;
+		}
+		_node = rhs._node;
+		return *this;
+	}
+
+/*
+	friend bool operator==(const ListIterator<T> & lhs, const ListIterator<T> & rhs) {
+		return (lhs._node == rhs._node);
+	}
+
+	friend bool operator!=(const ListIterator<T> & lhs, const ListIterator<T> & rhs) {
+		return (lhs._node != rhs._node);
+	}
+*/
+	bool & operator==(ListIterator<T> const & rhs) const {
+		return (_node == rhs._node);
+	}
+
+	bool & operator!=(ListIterator<T> const & rhs) const {
+		return (_node != rhs._node);
+	}
+
+	T & operator*() const {
+		return _node->data;
+	}
+
+	T * operator->() const {
+		return &(_node->data);
+	}
+
+	ListIterator & operator++() {
+		_node = _node->next;
+		return *this;
+	}
+
+	ListIterator & operator++(int) {
+		ListIterator tmp(*this);
+		_node = _node->next;
+		return tmp;
+	}
+
+	ListIterator & operator--() {
+		_node = _node->prev;
+		return *this;
+	}
+
+	ListIterator & operator--(int) {
+		ListIterator tmp(*this);
+		_node = _node->prev;
+		return tmp;
+	}
+
+private:
+	typedef DNode<T> * node_pointer;
+
+	node_pointer _node;
+
+};
+
+/*
+
+██      ██ ███████ ████████
+██      ██ ██         ██
+██      ██ ███████    ██
+██      ██      ██    ██
+███████ ██ ███████    ██
+
+*/
 
 template <class T, class Alloc = std::allocator<T>>
 class list {
@@ -47,14 +148,12 @@ public:
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer pointer;
 	typedef typename allocator_type::const_pointer const_pointer;
-	// TODO: iterator
-	// TODO: const_iterator
+	typedef ListIterator<T> iterator;
+	typedef ListIterator<const T> const_iterator;
 	// TODO: reverse_iterator
 	// TODO: const_reverse_iterator
 	// TODO: difference_type
 	typedef size_t size_type;
-
-	// CONSTRUCTORS AND DESTRUCTORS
 
 	explicit list (const allocator_type & alloc = allocator_type()):
 		_alloc(alloc)
@@ -95,6 +194,36 @@ public:
 		_node_alloc.deallocate(_sentinel_node, 1);
 	}
 
+	/*
+
+	██ ████████ ███████ ██████   █████  ████████  ██████  ██████  ███████
+	██    ██    ██      ██   ██ ██   ██    ██    ██    ██ ██   ██ ██
+	██    ██    █████   ██████  ███████    ██    ██    ██ ██████  ███████
+	██    ██    ██      ██   ██ ██   ██    ██    ██    ██ ██   ██      ██
+	██    ██    ███████ ██   ██ ██   ██    ██     ██████  ██   ██ ███████
+
+	*/
+
+	iterator begin() {
+		return iterator(_sentinel_node->next);
+	}
+
+	//const_iterator begin() const;
+
+	iterator end() {
+		return iterator(_sentinel_node);
+	}
+
+	/*
+
+	 ██████  █████  ██████   █████   ██████ ██ ████████ ██    ██
+	██      ██   ██ ██   ██ ██   ██ ██      ██    ██     ██  ██
+	██      ███████ ██████  ███████ ██      ██    ██      ████
+	██      ██   ██ ██      ██   ██ ██      ██    ██       ██
+	 ██████ ██   ██ ██      ██   ██  ██████ ██    ██       ██
+
+	*/
+
 	bool empty() const {
 		return _sentinel_node->next == _sentinel_node;
 	}
@@ -114,6 +243,42 @@ public:
 		return _node_alloc.max_size();
 	}
 
+	/*
+
+	███████ ██      ███████ ███    ███      █████   ██████  ██████ ███████ ███████ ███████
+	██      ██      ██      ████  ████     ██   ██ ██      ██      ██      ██      ██
+	█████   ██      █████   ██ ████ ██     ███████ ██      ██      █████   ███████ ███████
+	██      ██      ██      ██  ██  ██     ██   ██ ██      ██      ██           ██      ██
+	███████ ███████ ███████ ██      ██     ██   ██  ██████  ██████ ███████ ███████ ███████
+
+	*/
+
+	reference front() {
+		return _sentinel_node->next->data;
+	}
+
+	const_reference front() const {
+		return _sentinel_node->next->data;
+	}
+
+	reference back() {
+		return _sentinel_node->prev->data;
+	}
+
+	const_reference back() const {
+		return _sentinel_node->prev->data;
+	}
+
+	/*
+
+	███    ███  ██████  ██████  ██ ███████ ██ ███████ ██████  ███████
+	████  ████ ██    ██ ██   ██ ██ ██      ██ ██      ██   ██ ██
+	██ ████ ██ ██    ██ ██   ██ ██ █████   ██ █████   ██████  ███████
+	██  ██  ██ ██    ██ ██   ██ ██ ██      ██ ██      ██   ██      ██
+	██      ██  ██████  ██████  ██ ██      ██ ███████ ██   ██ ███████
+
+	*/
+
 	void push_front(const value_type & val) {
 		_insert_front(_create_node(val));
 	}
@@ -130,6 +295,37 @@ public:
 		_delete(_sentinel_node->prev);
 	}
 
+	void swap (list & x) {
+		// TODO : check if same -> return;
+		node_pointer tmp_sentinel = x._sentinel_node;
+
+		x._sentinel_node = this->_sentinel_node;
+		this->_sentinel_node = tmp_sentinel;
+
+		// TODO : Check if it works !
+	}
+
+	void resize (size_type n, value_type val = value_type()) {
+		size_type previous_size = size();
+		size_type i = 0;
+
+		if (n == previous_size) {
+			return;
+		} else if (n > previous_size) {
+			while (i < n - previous_size) {
+				push_back(val);
+				i++;
+			}
+		} else {
+			while (i < previous_size - n) {
+				pop_back();
+				i++;
+			}
+		}
+
+		// TODO: How to invalidate iterators pointing to erased elements ?
+	}
+
 	void clear() {
 		node_pointer tmp = _sentinel_node->next;
 		node_pointer next;
@@ -141,7 +337,25 @@ public:
 		}
 	}
 
-	// DEBUG
+	/*
+
+	 ██████  ██████  ███████ ██████   █████  ████████ ██  ██████  ███    ██ ███████
+	██    ██ ██   ██ ██      ██   ██ ██   ██    ██    ██ ██    ██ ████   ██ ██
+	██    ██ ██████  █████   ██████  ███████    ██    ██ ██    ██ ██ ██  ██ ███████
+	██    ██ ██      ██      ██   ██ ██   ██    ██    ██ ██    ██ ██  ██ ██      ██
+	 ██████  ██      ███████ ██   ██ ██   ██    ██    ██  ██████  ██   ████ ███████
+
+	*/
+
+	/*
+
+	██████  ███████ ██████  ██    ██  ██████
+	██   ██ ██      ██   ██ ██    ██ ██
+	██   ██ █████   ██████  ██    ██ ██   ███
+	██   ██ ██      ██   ██ ██    ██ ██    ██
+	██████  ███████ ██████   ██████   ██████
+
+	*/
 
 	void print_list() {
 		node_pointer tmp = _sentinel_node->next;
@@ -155,6 +369,17 @@ public:
 		}
 	}
 
+
+	/*
+
+	██████  ██████  ██ ██    ██  █████  ████████ ███████
+	██   ██ ██   ██ ██ ██    ██ ██   ██    ██    ██
+	██████  ██████  ██ ██    ██ ███████    ██    █████
+	██      ██   ██ ██  ██  ██  ██   ██    ██    ██
+	██      ██   ██ ██   ████   ██   ██    ██    ███████
+
+	*/
+
 private:
 	typedef typename allocator_type::template rebind<DNode<T>>::other node_alloc;
 	typedef DNode<T> * node_pointer;
@@ -166,9 +391,7 @@ private:
 	node_pointer _create_node(const T & data, DNode<T> * prev = NULL, DNode<T> * next = NULL) {
 		node_pointer new_node = _node_alloc.allocate(1);
 
-		_node_alloc.construct(new_node, DNode<T>(data));
-		new_node->prev = prev;
-		new_node->next = next;
+		_node_alloc.construct(new_node, DNode<T>(data, prev, next));
 		return new_node;
 	}
 
