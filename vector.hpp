@@ -16,6 +16,8 @@ namespace ft {
 template < class T, class Alloc = std::allocator<T> >
 class vector {
 
+    // TODO: shrink dynamically _capacity to _size * 2 + 1 when _size < _capacity / 3
+
 public:
 
 	typedef T value_type;
@@ -29,7 +31,6 @@ public:
 	typedef ft::RandomAccessIterator<const T> const_iterator;
 	// TODO: reverse_iterator
 	// TODO: const_reverse_iterator
-	// TODO: difference_type
 	typedef size_t size_type;
 
 	// Constructors
@@ -80,12 +81,13 @@ public:
 		_delete_array();
 	}
 
-	// Assignement operator
+	// Assignment operator
 
 	vector & operator=(const vector & rhs) {
 		if (*this == rhs) {
-			return;
+			return *this;
 		}
+        // TODO
 	}
 
 	// Iterators
@@ -106,7 +108,7 @@ public:
 		return _array + _size;
 	}
 
-	// TODO : reverse iterators
+	// TODO : rbegin and rend
 
 	// Capacity
 
@@ -236,7 +238,40 @@ public:
 		_size--;
 	}
 
-	// TODO: insert
+    iterator insert(iterator position, const value_type & val) {
+        pointer new_array;
+        size_type pos_idx = position - begin();
+
+        if (_size + 1 > _capacity) {
+            new_array = _alloc.allocate(_capacity * 2 + 1);
+            for (size_type i = 0; i < pos_idx; i++) {
+                _alloc.construct(new_array + i, _array[i]);
+            }
+            _alloc.construct(new_array + pos_idx, val);
+            for (size_type i = pos_idx; i < _size; i++) {
+                _alloc.construct(new_array + i + 1, _array[i]);
+            }
+            _delete_array();
+            _array = new_array;
+            _capacity = _capacity * 2 + 1;
+        } else {
+            _alloc.construct(_array + _size, _array[_size - 1]);
+            for (size_type i = _size - 2; i >= pos_idx - 1; i--) {
+                _array[i + 1] = _array[i];
+            }
+            _array[pos_idx] = val;
+        }
+        _size++;
+        return begin() + pos_idx;
+    }
+
+    // TODO: insert
+
+    //void insert (iterator position, size_type n, const value_type& val) {}
+
+    /*template <class InputIterator>
+    void insert (iterator position, InputIterator first, InputIterator last);*/
+
 	// TODO: erase
 
 	void swap (vector & x) {
