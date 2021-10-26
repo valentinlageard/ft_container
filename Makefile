@@ -1,15 +1,15 @@
-NAME		=	test
+NAME_FT		=	test
 SRC			=	main.cpp
 
 OBJS		=	$(SRC:.cpp=.o)
 
-FLAGS		=	-Wall -Wextra -Werror -std=c++98
+FLAGS		=	-Wall -Wextra -Werror -std=c++98 -g
 CC			=	clang++ $(FLAGS)
 
-all:		$(NAME)
+$(NAME_FT):	$(OBJS)
+			$(CC) $(OBJS) -o $(NAME_FT)
 
-$(NAME):	$(OBJS)
-			$(CC) $(OBJS) -o $(NAME)
+all:		$(NAME_FT)
 
 %.o: %.cpp
 			$(CC) -c $< -o $@
@@ -19,7 +19,7 @@ clean:
 
 fclean:
 			make clean
-			rm -f $(NAME)
+			rm -f $(NAME_FT)
 
 re:			fclean all
 

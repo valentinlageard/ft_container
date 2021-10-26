@@ -87,6 +87,7 @@ public:
 	}
 
 	RandomAccessIterator & operator++(int) {
+		// TODO: Debug needed
 		RandomAccessIterator tmp(*this);
 		++_ptr;
 		return tmp;
@@ -98,17 +99,18 @@ public:
 	}
 
 	RandomAccessIterator & operator--(int) {
+		// TODO: Debug needed
 		RandomAccessIterator tmp(*this);
 		--_ptr;
 		return tmp;
 	}
 
 	RandomAccessIterator operator+(difference_type n) const {
-		return (_ptr + n);
+		return (RandomAccessIterator<T>(_ptr + n));
 	}
 
 	RandomAccessIterator operator-(difference_type n) const {
-		return (_ptr - n);
+		return (RandomAccessIterator<T>(_ptr - n));
 	}
 
 	difference_type operator-(RandomAccessIterator rhs) const {

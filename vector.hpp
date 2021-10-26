@@ -16,8 +16,6 @@ namespace ft {
 template < class T, class Alloc = std::allocator<T> >
 class vector {
 
-    // TODO: shrink dynamically _capacity to _size * 2 + 1 when _size < _capacity / 3
-
 public:
 
 	typedef T value_type;
@@ -87,7 +85,7 @@ public:
 		if (*this == rhs) {
 			return *this;
 		}
-        // TODO
+		// TODO
 	}
 
 	// Iterators
@@ -211,11 +209,10 @@ public:
 	 	_size = n;
 	 }
 
-	template <typename InputIterator>
+	template<typename InputIterator>
 	void assign(InputIterator first, InputIterator last,
-                typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL) {
 		difference_type new_size = ft::distance(first, last);
-		std::cout << "new_size: " << new_size << std::endl;
 		clear();
 		reserve(new_size);
 		for (difference_type i = 0; i < new_size; ++i) {
@@ -225,7 +222,7 @@ public:
 		_size = new_size;
 	}
 
-	void push_back (const value_type & val) {
+	void push_back(const value_type & val) {
 		if (_size == _capacity) {
 			reserve(_capacity * 2 + 1);
 		}
@@ -238,39 +235,47 @@ public:
 		_size--;
 	}
 
-    iterator insert(iterator position, const value_type & val) {
-        pointer new_array;
-        size_type pos_idx = position - begin();
+	iterator insert(iterator position, const value_type & val) {
+		// TODO: Refactor to call insert(pos, 1, val) !
+		size_type pos_idx = position - begin();
+		insert(position, 1, val);
+		return begin() + pos_idx;
+	}
 
-        if (_size + 1 > _capacity) {
-            new_array = _alloc.allocate(_capacity * 2 + 1);
-            for (size_type i = 0; i < pos_idx; i++) {
-                _alloc.construct(new_array + i, _array[i]);
-            }
-            _alloc.construct(new_array + pos_idx, val);
-            for (size_type i = pos_idx; i < _size; i++) {
-                _alloc.construct(new_array + i + 1, _array[i]);
-            }
-            _delete_array();
-            _array = new_array;
-            _capacity = _capacity * 2 + 1;
-        } else {
-            _alloc.construct(_array + _size, _array[_size - 1]);
-            for (size_type i = _size - 2; i >= pos_idx - 1; i--) {
-                _array[i + 1] = _array[i];
-            }
-            _array[pos_idx] = val;
-        }
-        _size++;
-        return begin() + pos_idx;
-    }
+	void insert(iterator position, size_type n, const value_type & val) {
+		pointer new_array;
+		size_type pos_idx = position - begin();
 
-    // TODO: insert
+		if (_size + n > _capacity) {
+			new_array = _alloc.allocate((_capacity + n) * 2 + 1);
+			for (size_type i = 0; i < pos_idx; i++) {
+				_alloc.construct(new_array + i, _array[i]);
+			}
+			for (size_type i = 0; i < n; i++) {
+				_alloc.construct(new_array + pos_idx + i, val);
+			}
+			for (size_type i = pos_idx; i < _size; i++) {
+				_alloc.construct(new_array + i + n, _array[i]);
+			}
+			_delete_array();
+			_array = new_array;
+			_capacity = (_capacity + n) * 2 + 1;
+		} else {
+			for (size_type i = 0; i < _size - pos_idx; i++) {
+				_alloc.construct(_array + _size + n - i - 1, _array[_size - 1 - i]);
+				_alloc.destroy(_array + _size - 1 - i);
+			}
+			for (size_type i = 0; i < n; i++) {
+				_alloc.construct(_array + pos_idx + i, val);
+			}
+		}
+		_size += n;
+	}
 
-    //void insert (iterator position, size_type n, const value_type& val) {}
+	// TODO: insert
 
-    /*template <class InputIterator>
-    void insert (iterator position, InputIterator first, InputIterator last);*/
+	/*template <class InputIterator>
+	void insert (iterator position, InputIterator first, InputIterator last);*/
 
 	// TODO: erase
 
@@ -314,7 +319,6 @@ private:
 	pointer _array;
 	size_type _size;
 	size_type _capacity;
-
 
 	void _delete_array() {
 		for (size_type i = 0; i < _size; i++) {
