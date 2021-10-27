@@ -86,11 +86,10 @@ public:
 		return *this;
 	}
 
-	RandomAccessIterator & operator++(int) {
-		// TODO: Debug needed
-		RandomAccessIterator tmp(*this);
+	RandomAccessIterator operator++(int) {
+		pointer tmp = _ptr;
 		++_ptr;
-		return tmp;
+		return RandomAccessIterator<T>(tmp);
 	}
 
 	RandomAccessIterator & operator--() {
@@ -98,11 +97,10 @@ public:
 		return *this;
 	}
 
-	RandomAccessIterator & operator--(int) {
-		// TODO: Debug needed
-		RandomAccessIterator tmp(*this);
+	RandomAccessIterator operator--(int) {
+		pointer tmp = _ptr;
 		--_ptr;
-		return tmp;
+		return RandomAccessIterator<T>(tmp);
 	}
 
 	RandomAccessIterator operator+(difference_type n) const {

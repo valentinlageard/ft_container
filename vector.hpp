@@ -16,6 +16,9 @@ namespace ft {
 template < class T, class Alloc = std::allocator<T> >
 class vector {
 
+	// TODO: Check for max_size when allocating new elements
+	// TODO: Check for allocation error when allocating elements
+
 public:
 
 	typedef T value_type;
@@ -272,10 +275,40 @@ public:
 		_size += n;
 	}
 
-	// TODO: insert
+	template <class InputIterator>
+	void insert(iterator position, InputIterator first, InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+		pointer new_array;
+		size_type pos_idx = position - begin();
+		size_type n = last - first;
 
-	/*template <class InputIterator>
-	void insert (iterator position, InputIterator first, InputIterator last);*/
+		if (_size + n > _capacity) {
+			new_array = _alloc.allocate((_capacity + n) * 2 + 1);
+			for (size_type i = 0; i < pos_idx; i++) {
+				_alloc.construct(new_array + i, _array[i]);
+			}
+			for (size_type i = 0; i < n; i++) {
+				_alloc.construct(new_array + pos_idx + i, *first);
+				first++;
+			}
+			for (size_type i = pos_idx; i < _size; i++) {
+				_alloc.construct(new_array + i + n, _array[i]);
+			}
+			_delete_array();
+			_array = new_array;
+			_capacity = (_capacity + n) * 2 + 1;
+		} else {
+			for (size_type i = 0; i < _size - pos_idx; i++) {
+				_alloc.construct(_array + _size + n - i - 1, _array[_size - 1 - i]);
+				_alloc.destroy(_array + _size - 1 - i);
+			}
+			for (size_type i = 0; i < n; i++) {
+				_alloc.construct(_array + pos_idx + i, *first);
+				first++;
+			}
+		}
+		_size += n;
+	}
 
 	// TODO: erase
 
