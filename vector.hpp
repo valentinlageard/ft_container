@@ -239,7 +239,6 @@ public:
 	}
 
 	iterator insert(iterator position, const value_type & val) {
-		// TODO: Refactor to call insert(pos, 1, val) !
 		size_type pos_idx = position - begin();
 		insert(position, 1, val);
 		return begin() + pos_idx;
@@ -250,7 +249,7 @@ public:
 		size_type pos_idx = position - begin();
 
 		if (_size + n > _capacity) {
-			new_array = _alloc.allocate((_capacity + n) * 2 + 1);
+			new_array = _alloc.allocate(_capacity + (n * 2) + 1);
 			for (size_type i = 0; i < pos_idx; i++) {
 				_alloc.construct(new_array + i, _array[i]);
 			}
@@ -262,7 +261,7 @@ public:
 			}
 			_delete_array();
 			_array = new_array;
-			_capacity = (_capacity + n) * 2 + 1;
+			_capacity = _capacity + (n * 2) + 1;
 		} else {
 			for (size_type i = 0; i < _size - pos_idx; i++) {
 				_alloc.construct(_array + _size + n - i - 1, _array[_size - 1 - i]);
@@ -283,7 +282,7 @@ public:
 		size_type n = last - first;
 
 		if (_size + n > _capacity) {
-			new_array = _alloc.allocate((_capacity + n) * 2 + 1);
+			new_array = _alloc.allocate(_capacity + (n * 2) + 1);
 			for (size_type i = 0; i < pos_idx; i++) {
 				_alloc.construct(new_array + i, _array[i]);
 			}
@@ -296,7 +295,7 @@ public:
 			}
 			_delete_array();
 			_array = new_array;
-			_capacity = (_capacity + n) * 2 + 1;
+			_capacity = _capacity + (n * 2) + 1;
 		} else {
 			for (size_type i = 0; i < _size - pos_idx; i++) {
 				_alloc.construct(_array + _size + n - i - 1, _array[_size - 1 - i]);
@@ -308,6 +307,26 @@ public:
 			}
 		}
 		_size += n;
+	}
+
+	iterator erase(iterator position) {
+		return erase(position, position + 1);
+	}
+
+	iterator erase(iterator first, iterator last) {
+		size_type pos_idx = first - begin();
+		size_type end_idx = last - begin();
+		size_type n = last - first;
+
+		for (size_type i = 0; i < n; i++) {
+			_alloc.destroy(_array + pos_idx + i);
+		}
+		for (size_type i = 0; i < _size - end_idx; i++) {
+			_alloc.construct(_array + pos_idx + i, _array[end_idx + i]);
+			_alloc.destroy(_array + end_idx + i);
+		}
+		_size -= n;
+		return RandomAccessIterator<T>(_array + pos_idx);
 	}
 
 	// TODO: erase
