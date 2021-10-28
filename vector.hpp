@@ -5,6 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <sstream>
+#include "algorithm.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
 
@@ -58,23 +59,28 @@ public:
 		}
 	}
 
-	// template <class InputIterator>
-	// vector(
-	// 	InputIterator first,
-	// 	InputIterator last,
-	// 	const allocator_type& alloc = allocator_type()):
-	// 	_alloc(alloc),
-	// 	_array(NULL),
-	// 	_size(???),
-	// 	_capacity(???)
-	// {}
+	 template <class InputIterator>
+	 vector(
+	 	InputIterator first,
+	 	InputIterator last,
+	 	const allocator_type& alloc = allocator_type(),
+		typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL):
+	 	_alloc(alloc),
+	 	_array(NULL),
+	 	_size(0),
+	 	_capacity(0)
+	 {
+		 assign(first, last);
+	 }
 
-	// vector(const vector& x):
-	// 	_alloc(alloc),
-	// 	_array(NULL),
-	// 	_size(???),
-	// 	_capacity(???)
-	// {}
+	vector(const vector & x):
+		_alloc(x.get_allocator()),
+		_array(NULL),
+		_size(0),
+		_capacity(0)
+	{
+		assign(x.begin(),  x.end());
+	}
 
 	// Destructor
 
@@ -85,7 +91,7 @@ public:
 	// Assignment operator
 
 	vector & operator=(const vector & rhs) {
-		if (*this == rhs) {
+		if (this == &rhs) {
 			return *this;
 		}
 		// TODO
@@ -329,9 +335,8 @@ public:
 		return RandomAccessIterator<T>(_array + pos_idx);
 	}
 
-	// TODO: erase
-
 	void swap (vector & x) {
+		// TODO: finish swap
 		allocator_type tmp_alloc = x._alloc;
 		pointer tmp_array = x._array;
 		size_type tmp_size = x._size;
@@ -340,7 +345,6 @@ public:
 		// if (*this == x) {
 		// 	return;
 		// }
-		// TODO : implement equal algorithm first
 
 		x._alloc = _alloc;
 		x._array = _array;
@@ -389,7 +393,36 @@ private:
 	}
 };
 
-// Non-member : relational operators and swap overload
+template <class T, class Alloc>
+bool operator==(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
+
+template <class T, class Alloc>
+bool operator!=(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+	return !(rhs == lhs);
+}
+template <class T, class Alloc>
+bool operator<(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <class T, class Alloc>
+bool operator<=(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+	return (!(rhs < lhs));
+}
+
+template <class T, class Alloc>
+bool operator>(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+	return (rhs < lhs);
+}
+
+template <class T, class Alloc>
+bool operator>=(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
+	return (!(lhs < rhs));
+}
+
+// TODO: swap overload
 
 }
 
