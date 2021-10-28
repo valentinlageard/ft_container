@@ -19,6 +19,7 @@ class vector {
 
 	// TODO: Check for max_size when allocating new elements
 	// TODO: Check for allocation error when allocating elements
+	// TODO: Check if NULL _array causes no bug ?
 
 public:
 
@@ -94,7 +95,18 @@ public:
 		if (this == &rhs) {
 			return *this;
 		}
-		// TODO
+		if (_array != NULL) {
+			_delete_array();
+		}
+		_size = rhs._size;
+		_capacity = rhs._capacity;
+		if (!rhs.empty()) {
+			_array = _alloc.allocate(_capacity);
+			for (size_type i = 0; i < _size; i++) {
+				_alloc.construct(_array + i, rhs._array[i]);
+			}
+		}
+		return *this;
 	}
 
 	// Iterators
@@ -335,23 +347,15 @@ public:
 		return RandomAccessIterator<T>(_array + pos_idx);
 	}
 
-	void swap (vector & x) {
-		// TODO: finish swap
-		allocator_type tmp_alloc = x._alloc;
+	void swap(vector & x) {
 		pointer tmp_array = x._array;
 		size_type tmp_size = x._size;
 		size_type tmp_capacity = x._capacity;
 
-		// if (*this == x) {
-		// 	return;
-		// }
-
-		x._alloc = _alloc;
 		x._array = _array;
 		x._size = _size;
 		x._capacity = _capacity;
 
-		_alloc = tmp_alloc;
 		_array = tmp_array;
 		_size = tmp_size;
 		_capacity = tmp_capacity;
@@ -381,6 +385,7 @@ private:
 				_alloc.destroy(_array + i);
 		}
 		_alloc.deallocate(_array, _capacity);
+		_array = NULL;
 	}
 
 	void _check_range(const size_type & n) const {
@@ -425,7 +430,10 @@ bool operator>=(const vector<T,Alloc> & lhs, const vector<T,Alloc> & rhs) {
 	return (!(lhs < rhs));
 }
 
-// TODO: swap overload
+template <class T, class Alloc>
+void swap(vector<T,Alloc> & x, vector<T,Alloc> & y) {
+	x.swap(y);
+}
 
 }
 
