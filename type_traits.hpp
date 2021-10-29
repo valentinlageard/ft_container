@@ -10,8 +10,8 @@ template <typename T> struct enable_if<true, T> {
 };
 
 template <typename T, T v> struct integral_constant {
-	static const T                  value = v;
-	typedef T                       value_type;
+	static const T value = v;
+	typedef T value_type;
 	typedef integral_constant<T, v> type;
 
 	operator value_type() const {
@@ -19,7 +19,7 @@ template <typename T, T v> struct integral_constant {
 	}
 };
 
-typedef integral_constant<bool, true>  true_type;
+typedef integral_constant<bool, true> true_type;
 typedef integral_constant<bool, false> false_type;
 
 template <typename> struct is_integral_base : false_type {};
