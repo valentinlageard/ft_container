@@ -269,8 +269,6 @@ template <typename T1, typename T2> bool operator!=(const MapIterator<T1> & lhs,
 	return (lhs._node != rhs._node);
 }
 
-//TODO: Map
-
 template <class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<pair<const Key, T> > >
 class map {
 
@@ -287,10 +285,10 @@ public:
 	typedef const value_type & const_reference;
 	typedef typename Alloc::pointer pointer;
 	typedef typename Alloc::const_pointer const_pointer;
-	//TODO: iterator
-	//TODO: const_iterator
-	//TODO: reverse_iterator
-	//TODO: const_reverse_iterator
+	typedef MapIterator<value_type> iterator;
+	typedef MapIterator<const value_type> const_iterator;
+	typedef ft::reverse_iterator<iterator> reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	// Constructors and destructor.
 
