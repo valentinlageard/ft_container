@@ -35,8 +35,16 @@ public:
 		return _right;
 	}
 
+	BSTNode * get_parent() const {
+		return _parent;
+	}
+
 	value_type * get_pair() const {
 		return _pair;
+	}
+
+	void set_parent(BSTNode * parent) {
+		_parent = parent;
 	}
 
 	size_type size() const {
@@ -58,6 +66,7 @@ public:
 		if (_comp(_pair->first, node->_pair->first)) {
 			if (!_right) {
 				_right = node;
+				_right->set_parent(this);
 				return _right;
 			} else {
 				return _right->insert(node);
@@ -65,6 +74,7 @@ public:
 		} else {
 			if (!_left) {
 				_left = node;
+				_left->set_parent(this);
 				return _left;
 			} else {
 				return _left->insert(node);
@@ -94,16 +104,19 @@ public:
 private:
 
 	value_type * _pair;
+	BSTNode * _parent;
 	BSTNode * _left;
 	BSTNode * _right;
 	key_compare _comp;
 
 	void _recursive_print(std::string indent = "", bool is_left = false) {
 		if (!is_left) {
-			std::cout << indent << "├R─> " << _pair->first << ": " << _pair->second << std::endl;
+			std::cout << indent << "├R─> " << _pair->first << ": " << _pair->second;
+			std::cout << " (parent key: " << _parent->_pair->first << ")" << std::endl;
 			indent = indent.append("|    ");
 		} else {
-			std::cout << indent << "└L─> " << _pair->first << ": " << _pair->second << std::endl;
+			std::cout << indent << "└L─> " << _pair->first << ": " << _pair->second;
+			std::cout << " (parent key: " << _parent->_pair->first << ")" << std::endl;
 			indent = indent.append("     ");
 		}
 		if (_right) {
@@ -119,7 +132,51 @@ private:
 	}
 };
 
-//TODO: BSTNodeIterator
+template <class T> class MapIterator : public ft::iterator<ft::bidirectional_iterator_tag, T> {
+
+	// Let's consider T is a pair !
+
+public:
+	typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::iterator_category iterator_category;
+	typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::difference_type difference_type;
+	typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::value_type value_type;
+	typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer pointer;
+	typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference reference;
+	typedef ft::BSTNode<const typename T::first_type, typename T::second_type> node;
+	typedef node * node_pointer;
+	typedef node & node_reference;
+
+	MapIterator() : _node(NULL) {}
+
+	MapIterator(node_pointer node) : _node(node) {}
+
+	MapIterator(MapIterator const & original) : _node(original._node) {}
+
+	~MapIterator() {}
+
+	MapIterator & operator=(const MapIterator & rhs) {
+		if (this == &rhs) {
+			return *this;
+		}
+		_node = rhs._node;
+		return *this;
+	}
+
+	T & operator*() const {
+		return *(_node->get_pair());
+	}
+
+	T * operator->() const {
+		return &(*(_node->get_pair()));
+	}
+
+private:
+	node_pointer _node;
+
+};
+
+
+
 //TODO: Map
 
 template <class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<pair<const Key, T> > >
@@ -171,6 +228,27 @@ public:
 	size_type max_size() const {
 		return _alloc.max_size();
 	}
+
+
+	// Element access
+
+//	mapped_type & operator[](const key_type & k) {
+//		return (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second;
+//	}
+
+	// Modifiers
+
+	//pair<iterator, bool> insert(const value_type & val) {}
+	//iterator insert (iterator position, const value_type& val);
+	//template <class InputIterator> void insert (InputIterator first, InputIterator last);
+
+	// Observers
+
+	key_compare key_comp() const {
+		return key_compare(_comp);
+	}
+
+	//value_compare value_comp() const {}
 
 private:
 	typedef BSTNode<key_type, mapped_type, key_compare> _node_type;
