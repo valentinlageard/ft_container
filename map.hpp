@@ -27,6 +27,17 @@ public:
 
 	virtual ~BSTNode() {}
 
+	BSTNode & operator=(BSTNode & rhs) {
+		if (this == &rhs) {
+			return *this;
+		}
+		_pair = rhs._pair;
+		_left = rhs._left;
+		_right = rhs._right;
+		_parent = rhs._parent;
+		return *this;
+	}
+
 	BSTNode * get_left() const {
 		return _left;
 	}
@@ -41,6 +52,52 @@ public:
 
 	value_type * get_pair() const {
 		return _pair;
+	}
+
+	BSTNode * get_next() const {
+		BSTNode * tmp;
+		BSTNode * tmp_parent;
+
+		if (_right) {
+			tmp = _right;
+			while (tmp->_left) {
+				tmp = tmp->_left;
+			}
+			return tmp;
+		}
+		tmp = const_cast<BSTNode *>(this);
+		tmp_parent = _parent;
+		while (tmp_parent) {
+			if (tmp_parent->_right != tmp) {
+				break;
+			}
+			tmp = _parent;
+			tmp_parent = tmp->_parent;
+		}
+		return tmp_parent;
+	}
+
+	BSTNode * get_prev() const {
+		BSTNode * tmp;
+		BSTNode * tmp_parent;
+
+		if (_left) {
+			tmp = _left;
+			while (tmp->_right) {
+				tmp = tmp->_right;
+			}
+			return tmp;
+		}
+		tmp = const_cast<BSTNode *>(this);
+		tmp_parent = _parent;
+		while (tmp_parent) {
+			if (tmp_parent->_left != tmp) {
+				break;
+			}
+			tmp = _parent;
+			tmp_parent = tmp->_parent;
+		}
+		return tmp_parent;
 	}
 
 	void set_parent(BSTNode * parent) {
@@ -168,6 +225,29 @@ public:
 
 	T * operator->() const {
 		return &(*(_node->get_pair()));
+	}
+
+	MapIterator & operator++() {
+		_node = _node->get_next();
+		return *this;
+	}
+
+	MapIterator operator++(int) {
+		node_pointer tmp(_node);
+		_node = _node->get_next();
+		return MapIterator<T>(tmp);
+
+	}
+
+	MapIterator & operator--() {
+		_node = _node->get_prev();
+		return *this;
+	}
+
+	MapIterator operator--(int) {
+		node_pointer tmp(_node);
+		_node = _node->get_prev();
+		return MapIterator<T>(tmp);
 	}
 
 private:
