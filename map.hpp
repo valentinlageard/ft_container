@@ -250,12 +250,24 @@ public:
 		return MapIterator<T>(tmp);
 	}
 
+	template <typename T1, typename T2>
+	friend bool operator==(const MapIterator<T1> & lhs, const MapIterator<T2> & rhs);
+
+	template <typename T1, typename T2>
+	friend bool operator!=(const MapIterator<T1> & lhs, const MapIterator<T2> & rhs);
+
 private:
 	node_pointer _node;
 
 };
 
+template <typename T1, typename T2> bool operator==(const MapIterator<T1> & lhs, const MapIterator<T2> & rhs) {
+	return (lhs._node == rhs._node);
+}
 
+template <typename T1, typename T2> bool operator!=(const MapIterator<T1> & lhs, const MapIterator<T2> & rhs) {
+	return (lhs._node != rhs._node);
+}
 
 //TODO: Map
 
