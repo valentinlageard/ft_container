@@ -15,22 +15,40 @@ template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
 public:
 
 	typedef Key key_type;
-	typedef T value_type;
-	typedef ft::pair<const Key, T> pair_type;
+	typedef T mapped_type;
+	typedef ft::pair<const Key, T> value_type;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
 	typedef Compare key_compare;
 
 	BSTNode() : _pair(NULL), _left(NULL), _right(NULL), _comp(key_compare()) {}
 
-	BSTNode(pair_type * pair) : _pair(pair), _left(NULL), _right(NULL), _comp(key_compare()) {}
+	BSTNode(value_type * pair) : _pair(pair), _left(NULL), _right(NULL), _comp(key_compare()) {}
 
 	virtual ~BSTNode() {}
 
-	BSTNode * get_left() {
+	BSTNode * get_left() const {
 		return _left;
 	}
 
-	BSTNode * get_right() {
+	BSTNode * get_right() const {
 		return _right;
+	}
+
+	value_type * get_pair() const {
+		return _pair;
+	}
+
+	size_type size() const {
+		size_type left_subcount = 0;
+		size_type right_subcount = 0;
+		if (_right) {
+			right_subcount = _right->size();
+		}
+		if (_left) {
+			left_subcount = _left->size();
+		}
+		return right_subcount + left_subcount + 1;
 	}
 
 	BSTNode * insert(BSTNode * node) {
@@ -75,7 +93,7 @@ public:
 
 private:
 
-	const pair_type * _pair;
+	value_type * _pair;
 	BSTNode * _left;
 	BSTNode * _right;
 	key_compare _comp;
@@ -103,42 +121,68 @@ private:
 
 //TODO: BSTNodeIterator
 //TODO: Map
-//
-//template <class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<pair<const Key, T> > >
-//class map {
-//
-//public:
-//
-//	typedef Key key_type;
-//	typedef T mapped_type;
-//	typedef ft::pair<const Key, T> value_type;
-//	typedef size_t size_type;
-//	typedef ptrdiff_t difference_type;
-//	typedef Compare key_compare;
-//	typedef Alloc allocator_type;
-//	typedef value_type & reference;
-//	typedef const value_type & const_reference;
-//	typedef typename Alloc::pointer pointer;
-//	typedef typename Alloc::const_pointer const_pointer;
-//	//TODO: iterator
-//	//TODO: const_iterator
-//	//TODO: reverse_iterator
-//	//TODO: const_reverse_iterator
-//
-//	map() : _root(NULL), _size(0) {};
-//
-//	virtual ~map() {
-//		// Delete the tree
-//	};
-//
-//private:
-//	typedef BSTNode<key_type, mapped_type, key_compare> _node_type;
-//	typedef _node_type * _node_pointer;
-//	typedef typename Alloc::template rebind<_node_type>::other _node_alloc;
-//
-//	_node_pointer _root;
-//
-//};
+
+template <class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<pair<const Key, T> > >
+class map {
+
+public:
+
+	typedef Key key_type;
+	typedef T mapped_type;
+	typedef ft::pair<const Key, T> value_type;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
+	typedef Compare key_compare;
+	typedef Alloc allocator_type;
+	typedef value_type & reference;
+	typedef const value_type & const_reference;
+	typedef typename Alloc::pointer pointer;
+	typedef typename Alloc::const_pointer const_pointer;
+	//TODO: iterator
+	//TODO: const_iterator
+	//TODO: reverse_iterator
+	//TODO: const_reverse_iterator
+
+	// Constructors and destructor.
+
+	explicit map(const key_compare & comp = key_compare(), const allocator_type & alloc = allocator_type()) :
+			_root(NULL), _comp(comp), _alloc(alloc), _node_alloc(_node_allocator_type()) {};
+
+	//TODO: Range constructor
+	//TODO: Copy constructor
+
+	virtual ~map() {
+		// Delete the tree
+	};
+
+	// Capacity
+
+	bool empty() const {
+		return (_root == NULL);
+	}
+
+	size_type size() const {
+		if (_root) {
+			return _root->size();
+		}
+		return 0;
+	}
+
+	size_type max_size() const {
+		return _alloc.max_size();
+	}
+
+private:
+	typedef BSTNode<key_type, mapped_type, key_compare> _node_type;
+	typedef _node_type * _node_pointer;
+	typedef typename Alloc::template rebind<_node_type>::other _node_allocator_type;
+
+	_node_pointer _root;
+	allocator_type _alloc;
+	_node_allocator_type _node_alloc;
+	key_compare _comp;
+
+};
 
 }
 
