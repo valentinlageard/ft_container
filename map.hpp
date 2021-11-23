@@ -54,7 +54,22 @@ public:
 		return _pair;
 	}
 
-	BSTNode * get_next() const {
+    BSTNode * find_min() {
+        if (!_left) {
+            return this;
+        }
+        return _left->find_min();
+    }
+
+    BSTNode * find_max() {
+        if (!_right) {
+            return this;
+        }
+        return _right->find_max();
+    }
+
+
+    BSTNode * get_next() {
 		BSTNode * tmp;
 		BSTNode * tmp_parent;
 
@@ -65,7 +80,7 @@ public:
 			}
 			return tmp;
 		}
-		tmp = const_cast<BSTNode *>(this);
+		tmp = this;
 		tmp_parent = _parent;
 		while (tmp_parent) {
 			if (tmp_parent->_right != tmp) {
@@ -77,7 +92,7 @@ public:
 		return tmp_parent;
 	}
 
-	BSTNode * get_prev() const {
+	BSTNode * get_prev() {
 		BSTNode * tmp;
 		BSTNode * tmp_parent;
 
@@ -88,7 +103,7 @@ public:
 			}
 			return tmp;
 		}
-		tmp = const_cast<BSTNode *>(this);
+		tmp = this;
 		tmp_parent = _parent;
 		while (tmp_parent) {
 			if (tmp_parent->_left != tmp) {
@@ -302,6 +317,24 @@ public:
 		// Delete the tree
 	};
 
+    // Iterators
+
+    iterator begin() {
+        return iterator(_root->find_min());
+    }
+
+    //const_iterator begin() const;
+
+    //TODO: How to implement the end iterator ?
+    // - Map automatically keep tracks of the first and last node ?
+    // - Use a sentinel value as the max node right child ?
+
+    iterator end() {
+        return iterator(_root->find_max()) + 1;
+    }
+
+    //const_iterator end() const;
+
 	// Capacity
 
 	bool empty() const {
@@ -328,8 +361,20 @@ public:
 
 	// Modifiers
 
-	//pair<iterator, bool> insert(const value_type & val) {}
-	//iterator insert (iterator position, const value_type& val);
+	ft::pair<iterator, bool> insert(const value_type & val) {
+        value_type value = _alloc.allocate(1);
+        _node node_tmp = node(val);
+        _node_pointer node = _node_alloc.allocate(1);
+
+        _alloc.construct(value, val);
+        _node_alloc.construct(node, node_tmp);
+        if (!_root) {
+            _root = node;
+        }
+        _root->insert(node);
+    }
+
+    //iterator insert (iterator position, const value_type& val);
 	//template <class InputIterator> void insert (InputIterator first, InputIterator last);
 
 	// Observers
