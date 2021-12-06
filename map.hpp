@@ -3,11 +3,21 @@
 
 #include "utility.hpp"
 
-// Who gets to allocate the BSTNode ? The BSTNode itself or the map ? I guess it could be the map that allocates the
-// node and then pass that node to the BSTNode functions... ?
-// For instance, while inserting, the map allocates the node using a rebound allocator and pass it to the insert
-// method.
+//TODO: Who gets to allocate the BSTNode ?
+// Map gets to allocate the nodes.
+// Pros:
+//      - Only map has to store a rebound allocator.
+// Cons:
+//      - ??
+// BSTNode gets to allocate its children.
+// Pros:
+//      - Insertion algorithm is entirely managed by the nodes.
+// Cons:
+//      - Every node has an allocator instance...
+// I think the BSTNode should allocate its child by taking a rebound allocator as a template parameter.
+// But this approach assumes that every node has its own allocator which may be heavy in memory footprint.
 
+//TODO: There is a problem when passing a ft::pair<T1, T2> because value_type must be ft::pair<CONST T1, t2>
 
 namespace ft {
 
@@ -131,6 +141,7 @@ public:
 		return right_subcount + left_subcount + 1;
 	}
 
+    //TODO: The insert algorithm should be able to return : if the node already exists and an iterator to the node.
 	BSTNode * insert(BSTNode * node) {
 		if (!_comp(_pair->first, node->_pair->first) && !_comp(node->_pair->first, _pair->first)) {
 			return NULL;
@@ -308,12 +319,12 @@ public:
 	// Constructors and destructor.
 
 	explicit map(const key_compare & comp = key_compare(), const allocator_type & alloc = allocator_type()) :
-			_root(NULL), _comp(comp), _alloc(alloc), _node_alloc(_node_allocator_type()) {};
+			_root(NULL), _alloc(alloc), _node_alloc(_node_allocator_type()), _comp(comp) {};
 
 	//TODO: Range constructor
 	//TODO: Copy constructor
 
-	virtual ~map() {
+	virtual ~map() { //TODO: remove virtual ??
 		// Delete the tree
 	};
 
@@ -328,6 +339,7 @@ public:
     //TODO: How to implement the end iterator ?
     // - Map automatically keep tracks of the first and last node ?
     // - Use a sentinel value as the max node right child ?
+    // In any cases the end iterator should be able to find the max node if iterated in reverse !
 
     iterator end() {
         return iterator(_root->find_max()) + 1;
@@ -363,7 +375,7 @@ public:
 
 	ft::pair<iterator, bool> insert(const value_type & val) {
         value_type value = _alloc.allocate(1);
-        _node node_tmp = node(val);
+        _node_type node_tmp = node(val);
         _node_pointer node = _node_alloc.allocate(1);
 
         _alloc.construct(value, val);
@@ -372,6 +384,8 @@ public:
             _root = node;
         }
         _root->insert(node);
+        //TODO: clean return
+        //return ft::pair<MapIterator<>, true>();
     }
 
     //iterator insert (iterator position, const value_type& val);
@@ -384,6 +398,15 @@ public:
 	}
 
 	//value_compare value_comp() const {}
+
+    // DEBUG
+    //TODO : to remove
+
+    void print_tree() const {
+        if (_root) {
+            _root->print_subtree();
+        }
+    }
 
 private:
 	typedef BSTNode<key_type, mapped_type, key_compare> _node_type;

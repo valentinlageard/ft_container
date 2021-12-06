@@ -366,33 +366,39 @@ int main() {
 	ft::pair<const int, std::string> * d_pair = new ft::pair<const int, std::string>(0, "lolilol");
 	ft::pair<const int, std::string> * e_pair = new ft::pair<const int, std::string>(0, "mlqksd");
 
-	ft::BSTNode<const int, std::string> node_a(a_pair);
-	ft::BSTNode<const int, std::string> node_b(b_pair);
-	ft::BSTNode<const int, std::string> node_c(c_pair);
-	ft::BSTNode<const int, std::string> node_d(d_pair);
-	ft::BSTNode<const int, std::string> node_e(e_pair);
+//	ft::BSTNode<const int, std::string> node_a(a_pair);
+//	ft::BSTNode<const int, std::string> node_b(b_pair);
+//	ft::BSTNode<const int, std::string> node_c(c_pair);
+//	ft::BSTNode<const int, std::string> node_d(d_pair);
+//	ft::BSTNode<const int, std::string> node_e(e_pair);
+//
+//	ft::MapIterator<ft::pair<const int, std::string> > it(&node_a);
+//
+//	node_a.insert(&node_b);
+//	node_a.insert(&node_c);
+//	node_a.insert(&node_d);
+//	if (!node_a.insert(&node_e)) {
+//		std::cout << "Key " << node_e.get_pair()->first << " already exists." << std::endl;
+//	}
+//
+//	node_a.print_subtree();
+//	std::cout << "Size: " << node_a.size() << std::endl;
+//	std::cout << "*it -> " << (*it).first << std::endl;
+//	++it;
+//	std::cout << "++it -> " << (*it).first << std::endl;
+//	--it;
+//	std::cout << "--it -> " << (*it).first << std::endl;
+//	--it;
+//	std::cout << "--it -> " << (*it).first << std::endl;
+//	--it;
+//	std::cout << "--it -> " << (*it).first << std::endl;
 
-	ft::MapIterator<ft::pair<const int, std::string> > it(&node_a);
+    ft::map<int, std::string> my_map;
 
-	node_a.insert(&node_b);
-	node_a.insert(&node_c);
-	node_a.insert(&node_d);
-	if (!node_a.insert(&node_e)) {
-		std::cout << "Key " << node_e.get_pair()->first << " already exists." << std::endl;
-	}
+    ft::pair<int, std::string> pair1;
+    pair1 = ft::make_pair(0, std::string("salut"));
 
-	node_a.print_subtree();
-	std::cout << "Size: " << node_a.size() << std::endl;
-	std::cout << "*it -> " << (*it).first << std::endl;
-	++it;
-	std::cout << "++it -> " << (*it).first << std::endl;
-	--it;
-	std::cout << "--it -> " << (*it).first << std::endl;
-	--it;
-	std::cout << "--it -> " << (*it).first << std::endl;
-	--it;
-	std::cout << "--it -> " << (*it).first << std::endl;
-
+    my_map.insert(pair1);
 
 	delete a_pair;
 	delete b_pair;
