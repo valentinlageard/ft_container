@@ -164,6 +164,10 @@ void test_vector() {
 	// TODO: Test for loop iteration
 	// TODO: Test reverse iteration
 
+	NS::vector<int>::const_iterator cit = it;
+	std::cout << "*cit -> " << *cit << std::endl;
+
+
 	std::cout << "---------- TESTING MODIFIERS ----------" << std::endl;
 
 	std::cout << "clear()" << std::endl;
@@ -356,15 +360,15 @@ void test_vector() {
 
 int main() {
 
-	//test_vector();
+	test_vector();
 	//TODO: test_stack
 	//TODO: test_map
-
-	ft::pair<const int, std::string> * a_pair = new ft::pair<const int, std::string>(1, "salut");
-	ft::pair<const int, std::string> * b_pair = new ft::pair<const int, std::string>(2, "ewe");
-	ft::pair<const int, std::string> * c_pair = new ft::pair<const int, std::string>(-2, "lol");
-	ft::pair<const int, std::string> * d_pair = new ft::pair<const int, std::string>(0, "lolilol");
-	ft::pair<const int, std::string> * e_pair = new ft::pair<const int, std::string>(0, "mlqksd");
+//
+//	ft::pair<const int, std::string> * a_pair = new ft::pair<const int, std::string>(1, "salut");
+//	ft::pair<const int, std::string> * b_pair = new ft::pair<const int, std::string>(2, "ewe");
+//	ft::pair<const int, std::string> * c_pair = new ft::pair<const int, std::string>(-2, "lol");
+//	ft::pair<const int, std::string> * d_pair = new ft::pair<const int, std::string>(0, "lolilol");
+//	ft::pair<const int, std::string> * e_pair = new ft::pair<const int, std::string>(0, "mlqksd");
 
 //	ft::BSTNode<const int, std::string> node_a(a_pair);
 //	ft::BSTNode<const int, std::string> node_b(b_pair);
@@ -392,19 +396,19 @@ int main() {
 //	std::cout << "--it -> " << (*it).first << std::endl;
 //	--it;
 //	std::cout << "--it -> " << (*it).first << std::endl;
-
-    ft::map<int, std::string> my_map;
-
-    ft::pair<int, std::string> pair1;
-    pair1 = ft::make_pair(0, std::string("salut"));
-
-    my_map.insert(pair1);
-
-	delete a_pair;
-	delete b_pair;
-	delete c_pair;
-	delete d_pair;
-	delete e_pair;
+//
+//    ft::map<int, std::string> my_map;
+//
+//    ft::pair<int, std::string> pair1;
+//    pair1 = ft::make_pair(0, std::string("salut"));
+//
+//    my_map.insert(pair1);
+//
+//	delete a_pair;
+//	delete b_pair;
+//	delete c_pair;
+//	delete d_pair;
+//	delete e_pair;
 
 	return 0;
 }

@@ -52,7 +52,7 @@ public:
 
 	template <class InputIterator>
 	vector(InputIterator first, InputIterator last, const allocator_type & alloc = allocator_type(),
-		   typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL):
+		   typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0):
 			_alloc(alloc), _array(NULL), _size(0), _capacity(0) {
 		assign(first, last);
 	}
@@ -224,7 +224,7 @@ public:
 
 	template <typename InputIterator>
 	void assign(InputIterator first, InputIterator last,
-				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0) {
 		difference_type new_size = ft::distance(first, last);
 		clear();
 		reserve(new_size);
@@ -286,7 +286,7 @@ public:
 
 	template <class InputIterator>
 	void insert(iterator position, InputIterator first, InputIterator last,
-				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = NULL) {
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = 0) {
 		pointer new_array;
 		size_type pos_idx = position - begin();
 		size_type n = last - first;
