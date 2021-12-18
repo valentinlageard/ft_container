@@ -2,6 +2,7 @@
 #define ITERATOR_HPP
 
 #include <cstddef>
+#include "type_traits.hpp"
 
 
 namespace ft {
@@ -32,6 +33,10 @@ public:
 // Generic random access iterator
 
 template <class T> class RandomAccessIterator : public ft::iterator<ft::random_access_iterator_tag, T> {
+
+	friend class RandomAccessIterator<typename remove_const<T>::type>;
+
+	friend class RandomAccessIterator<const T>;
 
 public:
 
@@ -256,11 +261,11 @@ public:
 		if (this == &other) {
 			return *this;
 		}
-		_base = other._base;
+		_base = other.base();
 		return *this;
 	}
 
-	template <class Iter> reverse_iterator(const reverse_iterator<Iter> & rev_it): _base(rev_it._base) {}
+	template <class Iter> reverse_iterator(const reverse_iterator<Iter> & rev_it): _base(rev_it.base()) {}
 
 	iterator_type base() const {
 		return iterator_type(_base);

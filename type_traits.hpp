@@ -56,6 +56,14 @@ template <typename T> struct is_integral : is_integral_base<T> {};
 
 // TODO : remove_cv
 
+template <class T> struct remove_const {
+	typedef T type;
+};
+
+template <class T> struct remove_const<const T> {
+	typedef T type;
+};
+
 }
 
 #endif
