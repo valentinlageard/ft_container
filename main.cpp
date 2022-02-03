@@ -239,21 +239,24 @@ void test_vector() {
 	print_vector(my_vector);
 	assert(my_vector[0] == 66);
 
-	std::cout << "my_vector.insert(begin(), my_vector2.begin(), my_vector2.begin() + 5)" << std::endl;
+	std::cout << "my_vector.insert(begin(), my_vector2.begin(), my_vector2.begin() + 5)"
+			  << std::endl;
 	my_vector.insert(my_vector.begin(), my_vector2.begin(), my_vector2.begin() + 5);
 	print_vector(my_vector);
 	assert(my_vector[0] == 0);
 	assert(my_vector[4] == 4);
 
-	std::cout << "my_vector.insert(end(), my_vector2.begin() + 5, my_vector2.begin() + 10)" << std::endl;
+	std::cout << "my_vector.insert(end(), my_vector2.begin() + 5, my_vector2.begin() + 10)"
+			  << std::endl;
 	my_vector.insert(my_vector.end(), my_vector2.begin() + 5, my_vector2.begin() + 10);
 	print_vector(my_vector);
 	assert(my_vector[29] == 5);
 	assert(my_vector[33] == 9);
 
-	std::cout << "my_vector.insert(begin() + size() / 2, my_vector2.begin(), my_vector2.end())" << std::endl;
-	my_vector.insert(my_vector.begin() + static_cast<ptrdiff_t>(my_vector.size()) / 2, my_vector2.begin(),
-					 my_vector2.end());
+	std::cout << "my_vector.insert(begin() + size() / 2, my_vector2.begin(), my_vector2.end())"
+			  << std::endl;
+	my_vector.insert(my_vector.begin() + static_cast<ptrdiff_t>(my_vector.size()) / 2,
+					 my_vector2.begin(), my_vector2.end());
 	print_vector(my_vector);
 	assert(my_vector[17] == 0);
 	assert(my_vector[34] == 17);
@@ -269,14 +272,16 @@ void test_vector() {
 	assert(my_vector[2] == 4);
 
 	std::cout << "it_last_before_erase = my_vector.erase(begin() + 15, begin() + 32)" << std::endl;
-	NS::vector<int>::iterator it_last_before_erase = my_vector.erase(my_vector.begin() + 15, my_vector.begin() + 33);
+	NS::vector<int>::iterator
+			it_last_before_erase = my_vector.erase(my_vector.begin() + 15, my_vector.begin() + 33);
 	print_vector(my_vector);
 	std::cout << "*it_last_before_erase -> " << *it_last_before_erase << std::endl;
 
 	std::cout << "it_end = my_vector.erase(begin(), end())" << std::endl;
 	NS::vector<int>::iterator it_end = my_vector.erase(my_vector.begin(), my_vector.end());
 	print_vector(my_vector);
-	std::cout << "it_end == my_vector.end() -> " << (it_end == my_vector.end() ? "true" : "false") << std::endl;
+	std::cout << "it_end == my_vector.end() -> " << (it_end == my_vector.end() ? "true" : "false")
+			  << std::endl;
 
 	std::cout << "empty_vector.swap(my_vector)" << std::endl;
 	empty_vector.swap(my_vector);
@@ -363,52 +368,13 @@ int main() {
 	test_vector();
 	//TODO: test_stack
 	//TODO: test_map
-//
-//	ft::pair<const int, std::string> * a_pair = new ft::pair<const int, std::string>(1, "salut");
-//	ft::pair<const int, std::string> * b_pair = new ft::pair<const int, std::string>(2, "ewe");
-//	ft::pair<const int, std::string> * c_pair = new ft::pair<const int, std::string>(-2, "lol");
-//	ft::pair<const int, std::string> * d_pair = new ft::pair<const int, std::string>(0, "lolilol");
-//	ft::pair<const int, std::string> * e_pair = new ft::pair<const int, std::string>(0, "mlqksd");
 
-//	ft::BSTNode<const int, std::string> node_a(a_pair);
-//	ft::BSTNode<const int, std::string> node_b(b_pair);
-//	ft::BSTNode<const int, std::string> node_c(c_pair);
-//	ft::BSTNode<const int, std::string> node_d(d_pair);
-//	ft::BSTNode<const int, std::string> node_e(e_pair);
-//
-//	ft::MapIterator<ft::pair<const int, std::string> > it(&node_a);
-//
-//	node_a.insert(&node_b);
-//	node_a.insert(&node_c);
-//	node_a.insert(&node_d);
-//	if (!node_a.insert(&node_e)) {
-//		std::cout << "Key " << node_e.get_pair()->first << " already exists." << std::endl;
-//	}
-//
-//	node_a.print_subtree();
-//	std::cout << "Size: " << node_a.size() << std::endl;
-//	std::cout << "*it -> " << (*it).first << std::endl;
-//	++it;
-//	std::cout << "++it -> " << (*it).first << std::endl;
-//	--it;
-//	std::cout << "--it -> " << (*it).first << std::endl;
-//	--it;
-//	std::cout << "--it -> " << (*it).first << std::endl;
-//	--it;
-//	std::cout << "--it -> " << (*it).first << std::endl;
-//
-//    ft::map<int, std::string> my_map;
-//
-//    ft::pair<int, std::string> pair1;
-//    pair1 = ft::make_pair(0, std::string("salut"));
-//
-//    my_map.insert(pair1);
-//
-//	delete a_pair;
-//	delete b_pair;
-//	delete c_pair;
-//	delete d_pair;
-//	delete e_pair;
+	ft::map<int, std::string> my_map;
+
+	ft::pair<int, std::string> pair1;
+	pair1 = ft::make_pair(0, std::string("salut"));
+
+	my_map.insert(pair1);
 
 	return 0;
 }

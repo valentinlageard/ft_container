@@ -5,28 +5,29 @@ namespace ft {
 
 template <class T1, class T2> struct pair {
 
-public:
+	public:
 
-	typedef T1 first_type;
-	typedef T2 second_type;
+		typedef T1 first_type;
+		typedef T2 second_type;
 
-first_type first;
-	second_type second;
+		first_type first;
+		second_type second;
 
-	pair(): first(first_type()), second(second_type()) {}
+		pair() : first(first_type()), second(second_type()) {}
 
-    template<class U1, class U2> pair(const pair<U1, U2> & p): first(p.first), second(p.second) {}
+		template <class U1, class U2>
+		pair(const pair<U1, U2> & p): first(p.first), second(p.second) {}
 
-	pair(const first_type & a, const second_type & b) : first(a), second(b) {}
+		pair(const first_type & a, const second_type & b) : first(a), second(b) {}
 
-	pair & operator=(const pair & pr) {
-		if (this == &pr) {
+		pair & operator=(const pair & other) {
+			if (this == &other) {
+				return *this;
+			}
+			first = other.first;
+			second = other.second;
 			return *this;
 		}
-		first = pr.first;
-		second = pr.second;
-		return *this;
-	}
 
 };
 
@@ -46,7 +47,8 @@ template <class T1, class T2> bool operator<=(const pair<T1, T2> & lhs, const pa
 	return !(rhs < lhs);
 }
 
-template <class T1, class T2> bool operator>(const pair<T1, T2> & lhs, const pair<T1, T2> & rhs) { return rhs < lhs; }
+template <class T1, class T2>
+bool operator>(const pair<T1, T2> & lhs, const pair<T1, T2> & rhs) { return rhs < lhs; }
 
 template <class T1, class T2> bool operator>=(const pair<T1, T2> & lhs, const pair<T1, T2> & rhs) {
 	return !(lhs < rhs);
