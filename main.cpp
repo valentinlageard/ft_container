@@ -371,10 +371,14 @@ int main() {
 
 	ft::map<int, std::string> my_map;
 
-	ft::pair<int, std::string> pair1;
-	pair1 = ft::make_pair(0, std::string("salut"));
+	ft::pair<int, std::string> pair1 = ft::make_pair(0, std::string("salut"));
+	ft::pair<int, std::string> pair2 = ft::make_pair(8, std::string("yolo"));
+	ft::pair<int, std::string> pair3 = ft::make_pair(4, std::string("ewe"));
 
 	my_map.insert(pair1);
+	my_map.insert(pair2);
+	my_map.insert(pair3);
+	my_map.print_tree();
 
 	return 0;
 }

@@ -21,18 +21,20 @@
 
 namespace ft {
 
-template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
+template <class Key, class T> class BSTNode {
 	public:
 
 		typedef Key key_type;
 		typedef T mapped_type;
-		typedef ft::pair<const Key, T> value_type;
+		typedef ft::pair<Key, T> value_type;
 		typedef size_t size_type;
 		typedef ptrdiff_t difference_type;
-		typedef Compare key_compare;
 
-		BSTNode(const value_type & pair) :
-				_pair(pair), _left(NULL), _right(NULL), _comp(key_compare()) {}
+		BSTNode(const value_type & pair) : _pair(pair), _left(NULL), _right(NULL), _parent(NULL) {}
+
+		BSTNode(const BSTNode & other) :
+				_pair(other.get_pair()), _left(other.get_left()), _right(other.get_right()),
+				_parent(other.get_parent()) {}
 
 		virtual ~BSTNode() {}
 
@@ -47,15 +49,15 @@ template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
 			return *this;
 		}
 
-		BSTNode * get_left() {
+		BSTNode * get_left() const {
 			return _left;
 		}
 
-		BSTNode * get_right() {
+		BSTNode * get_right() const {
 			return _right;
 		}
 
-		BSTNode * get_parent() {
+		BSTNode * get_parent() const {
 			return _parent;
 		}
 
@@ -147,30 +149,6 @@ template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
 			return right_subcount + left_subcount + 1;
 		}
 
-		//TODO: The insert algorithm should be able to return : if the node already exists and an iterator to the node.
-		BSTNode * insert(BSTNode * node) {
-			if (!_comp(_pair->first, node->_pair->first) &&
-				!_comp(node->_pair->first, _pair->first)) {
-				return NULL;
-			}
-			if (_comp(_pair->first, node->_pair->first)) {
-				if (!_right) {
-					_right = node;
-					_right->set_parent(this);
-					return _right;
-				} else {
-					return _right->insert(node);
-				}
-			} else {
-				if (!_left) {
-					_left = node;
-					_left->set_parent(this);
-					return _left;
-				} else {
-					return _left->insert(node);
-				}
-			}
-		}
 
 		// search
 		// last
@@ -178,7 +156,7 @@ template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
 		// remove
 
 		void print_subtree() {
-			std::cout << _pair->first << ": " << _pair->second << std::endl;
+			std::cout << _pair.first << ": " << _pair.second << std::endl;
 			if (_right) {
 				_right->_recursive_print("", false);
 			} else {
@@ -194,11 +172,13 @@ template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
 		void _recursive_print(std::string indent = "", bool is_left = false) {
 			if (!is_left) {
 				std::cout << indent << "├R─> " << _pair.first << ": " << _pair.second;
-				std::cout << " (parent key: " << _parent->_pair->first << ")" << std::endl;
+				std::cout << " (parent key: " << (_parent ? _parent->_pair.first : 0) << ")"
+						  << std::endl;
 				indent = indent.append("|	");
 			} else {
 				std::cout << indent << "└L─> " << _pair.first << ": " << _pair.second;
-				std::cout << " (parent key: " << _parent->_pair->first << ")" << std::endl;
+				std::cout << " (parent key: " << (_parent ? _parent->_pair.first : 0) << ")"
+						  << std::endl;
 				indent = indent.append("	 ");
 			}
 			if (_right) {
@@ -219,7 +199,6 @@ template <class Key, class T, class Compare = std::less<Key> > class BSTNode {
 		BSTNode * _left;
 		BSTNode * _right;
 		BSTNode * _parent;
-		key_compare _comp;
 
 		BSTNode() {};
 
@@ -235,13 +214,15 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::value_type value_type;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference reference;
-		typedef ft::BSTNode<typename T::first_type const, typename T::second_type> node;
+		typedef typename value_type::first_type key_type;
+		typedef typename value_type::second_type mapped_type;
+		typedef ft::BSTNode<key_type, mapped_type> node;
 		typedef node * node_pointer;
 		typedef node & node_reference;
 
 		MapIterator() : _node(NULL) {}
 
-		MapIterator(node * node) : _node(node) {}
+		explicit MapIterator(node_pointer node) : _node(node) {}
 
 		MapIterator(const MapIterator & original) : _node(original._node) {}
 
@@ -434,7 +415,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 			} else {
 				inserted = false;
 			}
-			return ft::make_pair(MapIterator<value_type>(tmp), inserted);
+			return ft::make_pair(iterator(tmp), inserted);
 		}
 
 		//iterator insert (iterator position, const value_type& val);
@@ -458,7 +439,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 	private:
-		typedef BSTNode<const key_type, mapped_type, key_compare> _node_type;
+		typedef BSTNode<const key_type, mapped_type> _node_type;
 		typedef _node_type * _node_pointer;
 		typedef typename Alloc::template rebind<_node_type>::other _node_allocator_type;
 
