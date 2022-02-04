@@ -3,6 +3,7 @@
 #include "map.hpp"
 #include <cassert>
 #include <iomanip>
+#include <cstdlib>
 
 
 #ifndef NS
@@ -365,20 +366,43 @@ void test_vector() {
 
 int main() {
 
-	test_vector();
+	//test_vector();
 	//TODO: test_stack
 	//TODO: test_map
 
-	ft::map<int, std::string> my_map;
-
-	ft::pair<int, std::string> pair1 = ft::make_pair(0, std::string("salut"));
-	ft::pair<int, std::string> pair2 = ft::make_pair(8, std::string("yolo"));
-	ft::pair<int, std::string> pair3 = ft::make_pair(4, std::string("ewe"));
-
-	my_map.insert(pair1);
-	my_map.insert(pair2);
-	my_map.insert(pair3);
+	ft::map<int, char> my_map;
+	std::cout << "size: " << my_map.size() << std::endl;
 	my_map.print_tree();
+
+	for (int i = 0; i < 10; i++) {
+		int random_variable = std::rand() % 26;
+		ft::pair<int, char> pair = ft::make_pair(random_variable, random_variable + 65);
+		my_map.insert(pair);
+	}
+
+	std::cout << "size: " << my_map.size() << std::endl;
+	my_map.print_tree();
+
+	ft::map<int, char>::iterator it = my_map.begin();
+	for (; it != my_map.end(); it++) {
+		std::cout << it->first << std::endl;
+	}
+
+	//TODO: DEBUG NEEDED !
+//	ft::map<int, char>::reverse_iterator rit = my_map.rbegin();
+//	for (; rit != my_map.rend(); rit++) {
+//		std::cout << rit->first << std::endl;
+//	}
+
+	my_map.clear();
+
+	std::cout << "size: " << my_map.size() << std::endl;
+	my_map.print_tree();
+
+	it = my_map.begin();
+	for (; it != my_map.end(); it++) {
+		std::cout << it->first << std::endl;
+	}
 
 	return 0;
 }

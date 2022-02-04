@@ -3,21 +3,6 @@
 
 #include "utility.hpp"
 
-//TODO: Who gets to allocate the BSTNode ?
-// Map gets to allocate the nodes.
-// Pros:
-//	  - Only map has to store a rebound allocator.
-// Cons:
-//	  - ??
-// BSTNode gets to allocate its children.
-// Pros:
-//	  - Insertion algorithm is entirely managed by the nodes.
-// Cons:
-//	  - Every node has an allocator instance...
-// I think the BSTNode should allocate its child by taking a rebound allocator as a template parameter.
-// But this approach assumes that every node has its own allocator which may be heavy in memory footprint.
-
-//TODO: There is a problem when passing a ft::pair<T1, T2> because value_type must be ft::pair<CONST T1, t2>
 
 namespace ft {
 
@@ -32,9 +17,9 @@ template <class Key, class T> class BSTNode {
 
 		BSTNode(const value_type & pair) : _pair(pair), _left(NULL), _right(NULL), _parent(NULL) {}
 
-		BSTNode(const BSTNode & other) :
-				_pair(other.get_pair()), _left(other.get_left()), _right(other.get_right()),
-				_parent(other.get_parent()) {}
+		BSTNode(const BSTNode & original) :
+				_pair(original.get_pair()), _left(original.get_left()),
+				_right(original.get_right()), _parent(original.get_parent()) {}
 
 		virtual ~BSTNode() {}
 
@@ -59,6 +44,10 @@ template <class Key, class T> class BSTNode {
 
 		BSTNode * get_parent() const {
 			return _parent;
+		}
+
+		value_type & get_pair() {
+			return _pair;
 		}
 
 		const value_type & get_pair() const {
@@ -149,12 +138,6 @@ template <class Key, class T> class BSTNode {
 			return right_subcount + left_subcount + 1;
 		}
 
-
-		// search
-		// last
-		// first
-		// remove
-
 		void print_subtree() {
 			std::cout << _pair.first << ": " << _pair.second << std::endl;
 			if (_right) {
@@ -222,7 +205,7 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 
 		MapIterator() : _node(NULL) {}
 
-		explicit MapIterator(node_pointer node) : _node(node) {}
+		MapIterator(node_pointer node) : _node(node) {}
 
 		MapIterator(const MapIterator & original) : _node(original._node) {}
 
@@ -237,11 +220,11 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 		}
 
 		T & operator*() const {
-			return *(_node->get_pair());
+			return _node->get_pair();
 		}
 
 		T * operator->() const {
-			return &(*(_node->get_pair()));
+			return &(_node->get_pair());
 		}
 
 		MapIterator & operator++() {
@@ -253,7 +236,6 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 			node_pointer tmp(_node);
 			_node = _node->get_next();
 			return MapIterator<T>(tmp);
-
 		}
 
 		MapIterator & operator--() {
@@ -317,29 +299,51 @@ template <class Key, class T, class Compare = std::less<Key>,
 
 		//TODO: Range constructor
 		//TODO: Copy constructor
+		//TODO: Assign operator
 
-		virtual ~map() { //TODO: remove virtual ??
+		~map() { //TODO: remove virtual ??
 			// Delete the tree
 		};
 
 		// Iterators
 
 		iterator begin() {
-			return iterator(_root->find_min());
+			if (_root) { return iterator(_root->find_min()); }
+			return iterator(NULL);
 		}
 
-		//const_iterator begin() const;
-
-		//TODO: How to implement the end iterator ?
-		// - Map automatically keep tracks of the first and last node ?
-		// - Use a sentinel value as the max node right child ?
-		// In any cases the end iterator should be able to find the max node if iterated in reverse !
+		const_iterator begin() const {
+			if (_root) { return const_iterator(_root->find_min()); }
+			return const_iterator(NULL);
+		}
 
 		iterator end() {
-			return iterator(_root->find_max()) + 1;
+			if (_root) { ++iterator(_root->find_max()); }
+			return iterator(NULL);
 		}
 
-		//const_iterator end() const;
+		const_iterator end() const {
+			if (_root) { return ++const_iterator(_root->find_max()); }
+			return const_iterator(NULL);
+		}
+
+		//TODO: Reverse iterators don't work :(
+
+//		reverse_iterator rbegin() {
+//			return reverse_iterator(iterator(_root->find_max()));
+//		}
+//
+//		const_reverse_iterator rbegin() const {
+//			return const_reverse_iterator(const_iterator(_root->find_max()));
+//		}
+//
+//		reverse_iterator rend() {
+//			return reverse_iterator(--iterator(_root->find_min()));
+//		}
+//
+//		const_reverse_iterator rend() const {
+//			return const_reverse_iterator(--const_iterator(_root->find_min()));
+//		}
 
 		// Capacity
 
@@ -361,26 +365,35 @@ template <class Key, class T, class Compare = std::less<Key>,
 
 		// Element access
 
-//	mapped_type & operator[](const key_type & k) {
-//		return (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second;
-//	}
+//		mapped_type & operator[](const key_type & k) {
+//			return (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second;
+//		}
 
 		// Modifiers
 
-//		ft::pair<iterator, bool> insert(const value_type & val) {
-//			value_type value = _alloc.allocate(1);
-//			_node_type node_tmp = node(val);
-//			_node_pointer node = _node_alloc.allocate(1);
-//
-//			_alloc.construct(value, val);
-//			_node_alloc.construct(node, node_tmp);
-//			if (!_root) {
-//				_root = node;
-//			}
-//			_root->insert(node);
-//			//TODO: clean return
-//			//return ft::pair<MapIterator<>, true>();
-//		}
+		void clear() {
+			_node_type * tmp = _root;
+			_node_type * tmp_parent = NULL;
+
+			while (tmp) {
+				tmp_parent = tmp->get_parent();
+				if (tmp->get_left()) {
+					tmp = tmp->get_left();
+				} else if (tmp->get_right()) {
+					tmp = tmp->get_right();
+				} else {
+					if (tmp_parent && tmp_parent->get_left() == tmp) {
+						tmp_parent->set_left(NULL);
+					} else if (tmp_parent && tmp_parent->get_right() == tmp) {
+						tmp_parent->set_right(NULL);
+					}
+					_node_alloc.destroy(tmp);
+					_node_alloc.deallocate(tmp, 1);
+					tmp = tmp_parent;
+				}
+			}
+			_root = NULL;
+		}
 
 		ft::pair<iterator, bool> insert(const value_type & val) {
 			_node_type * tmp = _root;
@@ -390,17 +403,14 @@ template <class Key, class T, class Compare = std::less<Key>,
 			while (tmp) {
 				tmp_parent = tmp;
 				if (_comp(val.first, tmp->get_pair().first)) {
-					// If key is inferior to tmp
 					tmp = tmp->get_left();
 				} else if (_comp(tmp->get_pair().first, val.first)) {
-					// If key is superior to tmp
 					tmp = tmp->get_right();
 				} else {
 					break;
 				}
 			}
 			if (!tmp) {
-				// Case where we can insert
 				_node_type * new_node = _node_alloc.allocate(1);
 				_node_alloc.construct(new_node, val);
 				new_node->set_parent(tmp_parent);
@@ -431,7 +441,6 @@ template <class Key, class T, class Compare = std::less<Key>,
 
 		// DEBUG
 		//TODO : to remove
-
 		void print_tree() const {
 			if (_root) {
 				_root->print_subtree();
