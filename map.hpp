@@ -297,12 +297,22 @@ template <class Key, class T, class Compare = std::less<Key>,
 					 const allocator_type & alloc = allocator_type()) :
 				_root(NULL), _alloc(alloc), _node_alloc(_node_allocator_type()), _comp(comp) {};
 
-		//TODO: Range constructor
-		//TODO: Copy constructor
-		//TODO: Assign operator
+		map(const map & other) :
+				_root(NULL), _alloc(other._alloc), _node_alloc(other._node_alloc),
+				_comp(other._comp) {
+			insert(other.begin(), other.end());
+		}
 
-		~map() { //TODO: remove virtual ??
-			// Delete the tree
+		map & operator=(const map & other) {
+			if (this == &other) {
+				return *this;
+			}
+			clear();
+			insert(other.begin(), other.end());
+		}
+
+		~map() {
+			clear();
 		};
 
 		// Iterators
@@ -365,9 +375,32 @@ template <class Key, class T, class Compare = std::less<Key>,
 
 		// Element access
 
-//		mapped_type & operator[](const key_type & k) {
-//			return (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second;
-//		}
+		T & operator[](const Key & key) {
+			return insert(std::make_pair(key, T())).first->second;
+		}
+
+		T & at(const Key & key) {
+			_node_type * tmp = _root;
+
+			while (tmp) {
+				if (_comp(key, tmp->get_pair().first)) {
+					tmp = tmp->get_left();
+				} else if (_comp(tmp->get_pair().first, key)) {
+					tmp = tmp->get_right();
+				} else {
+					break;
+				}
+			}
+			if (!tmp) {
+				std::string exception_ss = "vector::at: key is out of range";
+				throw std::out_of_range(exception_ss);
+			}
+			return tmp->get_pair().second;
+		}
+
+		const T & at(const Key & key) const {
+			return at(key);
+		}
 
 		// Modifiers
 
@@ -429,7 +462,21 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		//iterator insert (iterator position, const value_type& val);
-		//template <class InputIterator> void insert (InputIterator first, InputIterator last);
+
+		template <class InputIterator> void insert(InputIterator first, InputIterator last) {
+			for (; first != last; first++) {
+				insert(*first);
+			}
+		}
+
+		void swap(map & other) {
+			if (this == &other) {
+				return;
+			}
+			_node_type * tmp = other._root;
+			other._root = _root;
+			_root = tmp;
+		}
 
 		// Observers
 
@@ -437,7 +484,9 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return key_compare(_comp);
 		}
 
-		//value_compare value_comp() const {}
+		value_compare value_comp() const {
+			return value_compare();
+		}
 
 		// DEBUG
 		//TODO : to remove
@@ -457,6 +506,11 @@ template <class Key, class T, class Compare = std::less<Key>,
 		_node_allocator_type _node_alloc;
 		key_compare _comp;
 };
+
+template <class Key, class T, class Compare, class Alloc>
+void swap(map<Key, T, Compare, Alloc> & lhs, map<Key, T, Compare, Alloc> & rhs) {
+	lhs.swap(rhs);
+}
 
 }
 
