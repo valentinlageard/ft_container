@@ -380,22 +380,13 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		T & at(const Key & key) {
-			_node_type * tmp = _root;
+			iterator it = find(key);
 
-			while (tmp) {
-				if (_comp(key, tmp->get_pair().first)) {
-					tmp = tmp->get_left();
-				} else if (_comp(tmp->get_pair().first, key)) {
-					tmp = tmp->get_right();
-				} else {
-					break;
-				}
-			}
-			if (!tmp) {
+			if (it == end()) {
 				std::string exception_ss = "vector::at: key is out of range";
 				throw std::out_of_range(exception_ss);
 			}
-			return tmp->get_pair().second;
+			return *it->second;
 		}
 
 		const T & at(const Key & key) const {
@@ -484,8 +475,46 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return key_compare(_comp);
 		}
 
-		value_compare value_comp() const {
-			return value_compare();
+//		value_compare value_comp() const {
+//			return value_compare();
+//		}
+
+		//Lookup
+
+		iterator find(const Key & key) {
+			_node_type * tmp = _root;
+
+			while (tmp) {
+				if (_comp(key, tmp->get_pair().first)) {
+					tmp = tmp->get_left();
+				} else if (_comp(tmp->get_pair().first, key)) {
+					tmp = tmp->get_right();
+				} else {
+					break;
+				}
+			}
+			if (!tmp) {
+				return end();
+			}
+			return iterator(tmp);
+		}
+
+		const_iterator find(const Key & key) const {
+			_node_type * tmp = _root;
+
+			while (tmp) {
+				if (_comp(key, tmp->get_pair().first)) {
+					tmp = tmp->get_left();
+				} else if (_comp(tmp->get_pair().first, key)) {
+					tmp = tmp->get_right();
+				} else {
+					break;
+				}
+			}
+			if (!tmp) {
+				return end();
+			}
+			return const_iterator(tmp);
 		}
 
 		// DEBUG
