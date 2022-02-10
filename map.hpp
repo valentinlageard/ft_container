@@ -286,6 +286,10 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 			return MapIterator<T>(tmp);
 		}
 
+		operator MapIterator<const T>() const {
+			return (MapIterator<const T>(_node));
+		}
+
 		template <typename T1, typename T2>
 		friend bool operator==(const MapIterator<T1> & lhs, const MapIterator<T2> & rhs);
 
@@ -329,6 +333,20 @@ template <class Key, class T, class Compare = std::less<Key>,
 		typedef MapIterator<const value_type> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+
+		class value_compare : public std::binary_function<value_type, value_type, bool> {
+				friend class map;
+
+			public:
+				bool operator()(const value_type & lhs, const value_type & rhs) const {
+					return comp(lhs.first, rhs.first);
+				}
+
+			protected:
+				Compare comp;
+
+				value_compare(Compare c) : comp(c) {}
+		};
 
 		// Constructors and destructor.
 
@@ -563,9 +581,9 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return key_compare(_comp);
 		}
 
-//		value_compare value_comp() const {
-//			return value_compare();
-//		}
+		value_compare value_comp() const {
+			return value_compare(_comp);
+		}
 
 		//Lookup
 
