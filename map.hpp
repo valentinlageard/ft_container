@@ -1,6 +1,9 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
+#include "algorithm.hpp"
+#include "iterator.hpp"
+#include "type_traits.hpp"
 #include "utility.hpp"
 
 
@@ -18,8 +21,8 @@ template <class Key, class T> class BSTNode {
 		BSTNode(const value_type & pair) : _pair(pair), _left(NULL), _right(NULL), _parent(NULL) {}
 
 		BSTNode(const BSTNode & original) :
-				_pair(original.get_pair()), _left(original.get_left()),
-				_right(original.get_right()), _parent(original.get_parent()) {}
+				_pair(original._pair), _left(original._left), _right(original._right),
+				_parent(original._parent) {}
 
 		virtual ~BSTNode() {}
 
@@ -34,15 +37,27 @@ template <class Key, class T> class BSTNode {
 			return *this;
 		}
 
-		BSTNode * get_left() const {
+		BSTNode * get_left() {
 			return _left;
 		}
 
-		BSTNode * get_right() const {
+		const BSTNode * get_left() const {
+			return _left;
+		}
+
+		BSTNode * get_right() {
 			return _right;
 		}
 
-		BSTNode * get_parent() const {
+		const BSTNode * get_right() const {
+			return _right;
+		}
+
+		BSTNode * get_parent() {
+			return _parent;
+		}
+
+		const BSTNode * get_parent() const {
 			return _parent;
 		}
 
@@ -97,7 +112,7 @@ template <class Key, class T> class BSTNode {
 				if (tmp_parent->_right != tmp) {
 					break;
 				}
-				tmp = _parent;
+				tmp = tmp_parent;
 				tmp_parent = tmp->_parent;
 			}
 			return tmp_parent;
@@ -120,7 +135,7 @@ template <class Key, class T> class BSTNode {
 				if (tmp_parent->_left != tmp) {
 					break;
 				}
-				tmp = _parent;
+				tmp = tmp_parent;
 				tmp_parent = tmp->_parent;
 			}
 			return tmp_parent;
@@ -203,11 +218,13 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 		typedef node * node_pointer;
 		typedef node & node_reference;
 
-		MapIterator() : _node(NULL) {}
+		MapIterator() : _node(NULL), _prev_node(NULL), _next_node(NULL) {}
 
-		MapIterator(node_pointer node) : _node(node) {}
+		MapIterator(node_pointer node) : _node(node), _prev_node(NULL), _next_node(NULL) {}
 
-		MapIterator(const MapIterator & original) : _node(original._node) {}
+		MapIterator(const MapIterator & original) :
+				_node(original._node), _prev_node(original._prev_node),
+				_next_node(original._next_node) {}
 
 		~MapIterator() {}
 
@@ -216,7 +233,17 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 				return *this;
 			}
 			_node = rhs._node;
+			_prev_node = rhs._prev_node;
+			_next_node = rhs._next_node;
 			return *this;
+		}
+
+		node * get_node() {
+			return _node;
+		}
+
+		const node * get_node() const {
+			return _node;
 		}
 
 		T & operator*() const {
@@ -228,24 +255,34 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 		}
 
 		MapIterator & operator++() {
-			_node = _node->get_next();
+			_prev_node = _node;
+			if (!_node) { _node = _next_node; }
+			else { _node = _node->get_next(); }
 			return *this;
 		}
 
 		MapIterator operator++(int) {
 			node_pointer tmp(_node);
-			_node = _node->get_next();
+			_prev_node = _node;
+			if (!_node) { _node = _next_node; }
+			else { _node = _node->get_next(); }
 			return MapIterator<T>(tmp);
 		}
 
+		//TODO: There is a problem when we do -- on the past last elem ! And conversely !
+
 		MapIterator & operator--() {
-			_node = _node->get_prev();
+			_next_node = _node;
+			if (!_node) { _node = _prev_node; }
+			else { _node = _node->get_prev(); }
 			return *this;
 		}
 
 		MapIterator operator--(int) {
 			node_pointer tmp(_node);
-			_node = _node->get_prev();
+			_next_node = _node;
+			if (!_node) { _node = _prev_node; }
+			else { _node = _node->get_prev(); }
 			return MapIterator<T>(tmp);
 		}
 
@@ -257,6 +294,8 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 
 	private:
 		node_pointer _node;
+		node_pointer _prev_node;
+		node_pointer _next_node;
 
 };
 
@@ -297,6 +336,13 @@ template <class Key, class T, class Compare = std::less<Key>,
 					 const allocator_type & alloc = allocator_type()) :
 				_root(NULL), _alloc(alloc), _node_alloc(_node_allocator_type()), _comp(comp) {};
 
+		template <class InputIt>
+		map(InputIt first, InputIt last, const Compare & comp = Compare(),
+			const allocator_type & alloc = allocator_type()) :
+				_root(NULL), _alloc(alloc), _node_alloc(_node_allocator_type()), _comp(comp) {
+			insert(first, last);
+		}
+
 		map(const map & other) :
 				_root(NULL), _alloc(other._alloc), _node_alloc(other._node_alloc),
 				_comp(other._comp) {
@@ -309,6 +355,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 			}
 			clear();
 			insert(other.begin(), other.end());
+			return *this;
 		}
 
 		~map() {
@@ -328,7 +375,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		iterator end() {
-			if (_root) { ++iterator(_root->find_max()); }
+			if (_root) { return ++iterator(_root->find_max()); }
 			return iterator(NULL);
 		}
 
@@ -339,21 +386,25 @@ template <class Key, class T, class Compare = std::less<Key>,
 
 		//TODO: Reverse iterators don't work :(
 
-//		reverse_iterator rbegin() {
-//			return reverse_iterator(iterator(_root->find_max()));
-//		}
-//
-//		const_reverse_iterator rbegin() const {
-//			return const_reverse_iterator(const_iterator(_root->find_max()));
-//		}
-//
-//		reverse_iterator rend() {
-//			return reverse_iterator(--iterator(_root->find_min()));
-//		}
-//
-//		const_reverse_iterator rend() const {
-//			return const_reverse_iterator(--const_iterator(_root->find_min()));
-//		}
+		reverse_iterator rbegin() {
+			if (_root) { return reverse_iterator(iterator(_root->find_max())); }
+			return reverse_iterator(NULL);
+		}
+
+		const_reverse_iterator rbegin() const {
+			if (_root) { return const_reverse_iterator(const_iterator(_root->find_max())); }
+			return const_reverse_iterator(NULL);
+		}
+
+		reverse_iterator rend() {
+			if (_root) { return reverse_iterator(--iterator(_root->find_min())); }
+			return reverse_iterator(NULL);
+		}
+
+		const_reverse_iterator rend() const {
+			if (_root) { return const_reverse_iterator(--const_iterator(_root->find_min())); }
+			return const_reverse_iterator(NULL);
+		}
 
 		// Capacity
 
@@ -369,14 +420,14 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		size_type max_size() const {
-			return _alloc.max_size();
+			return _node_alloc.max_size();
 		}
 
 
 		// Element access
 
 		T & operator[](const Key & key) {
-			return insert(std::make_pair(key, T())).first->second;
+			return insert(ft::make_pair(key, T())).first->second;
 		}
 
 		T & at(const Key & key) {
@@ -422,7 +473,6 @@ template <class Key, class T, class Compare = std::less<Key>,
 		ft::pair<iterator, bool> insert(const value_type & val) {
 			_node_type * tmp = _root;
 			_node_type * tmp_parent = NULL;
-			bool inserted;
 
 			while (tmp) {
 				tmp_parent = tmp;
@@ -440,19 +490,21 @@ template <class Key, class T, class Compare = std::less<Key>,
 				new_node->set_parent(tmp_parent);
 				if (!tmp_parent) {
 					_root = new_node;
+					tmp = _root;
 				} else if (_comp(val.first, tmp_parent->get_pair().first)) {
 					tmp_parent->set_left(new_node);
 				} else {
 					tmp_parent->set_right(new_node);
 				}
-				inserted = true;
-			} else {
-				inserted = false;
+				return ft::make_pair(iterator(new_node), true);
 			}
-			return ft::make_pair(iterator(tmp), inserted);
+			return ft::make_pair(iterator(tmp), false);
 		}
 
-		//iterator insert (iterator position, const value_type& val);
+		iterator insert(iterator position, const value_type & val) {
+			(void) position;
+			return insert(val).first;
+		}
 
 		template <class InputIterator> void insert(InputIterator first, InputIterator last) {
 			for (; first != last; first++) {
@@ -469,6 +521,42 @@ template <class Key, class T, class Compare = std::less<Key>,
 			_root = tmp;
 		}
 
+		void erase(iterator pos) {
+			_node_type * node = pos.get_node();
+			if (!node->get_left()) {
+				_subtree_shift(node, node->get_right());
+			} else if (!node->get_right()) {
+				_subtree_shift(node, node->get_left());
+			} else {
+				_node_type * next_node = node->get_next();
+				if (next_node->get_parent() != node) {
+					_subtree_shift(next_node, next_node->get_right());
+					next_node->set_right(node->get_right());
+					next_node->get_right()->set_parent(next_node);
+				}
+				_subtree_shift(node, next_node);
+				next_node->set_left(node->get_left());
+				next_node->get_left()->set_parent(next_node);
+			}
+			_node_alloc.destroy(node);
+			_node_alloc.deallocate(node, 1);
+		}
+
+		void erase(iterator first, iterator last) {
+			for (; first != last;) {
+				erase(first++);
+			}
+		}
+
+		size_type erase(const Key & key) {
+			iterator pos = find(key);
+			if (pos == end()) {
+				return 0;
+			}
+			erase(pos);
+			return 1;
+		}
+
 		// Observers
 
 		key_compare key_comp() const {
@@ -480,6 +568,10 @@ template <class Key, class T, class Compare = std::less<Key>,
 //		}
 
 		//Lookup
+
+		size_type count(const Key & key) const {
+			return find(key) != end();
+		}
 
 		iterator find(const Key & key) {
 			_node_type * tmp = _root;
@@ -517,8 +609,16 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return const_iterator(tmp);
 		}
 
-		// DEBUG
-		//TODO : to remove
+		//TODO: std::pair<iterator,iterator> equal_range( const Key& key );
+		//TODO: std::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
+
+		//TODO: iterator lower_bound( const Key& key );
+		//TODO: const_iterator lower_bound( const Key& key ) const;
+
+		//TODO: iterator upper_bound( const Key& key );
+		//TODO: const_iterator upper_bound( const Key& key ) const;
+
+		//TODO: DEBUG to remove
 		void print_tree() const {
 			if (_root) {
 				_root->print_subtree();
@@ -534,6 +634,20 @@ template <class Key, class T, class Compare = std::less<Key>,
 		allocator_type _alloc;
 		_node_allocator_type _node_alloc;
 		key_compare _comp;
+
+		void _subtree_shift(_node_type * node1, _node_type * node2) {
+			if (!node1->get_parent()) {
+				_root = node2;
+			} else if (node1 == node1->get_parent()->get_left()) {
+				node1->get_parent()->set_left(node2);
+			} else {
+				node1->get_parent()->set_right(node2);
+			}
+			if (node2) {
+				node2->set_parent(node1->get_parent());
+			}
+		}
+
 };
 
 template <class Key, class T, class Compare, class Alloc>
