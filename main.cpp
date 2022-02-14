@@ -383,38 +383,37 @@ int main() {
 	std::cout << "size: " << my_map.size() << std::endl;
 	my_map.print_tree();
 
-	ft::map<int, char>::iterator it = my_map.begin();
-	for (; it != my_map.end(); it++) {
-		std::cout << it->first << std::endl;
-	}
-	it = my_map.end();
+//	ft::map<int, char>::iterator it = my_map.begin();
+//	for (; it != my_map.end(); it++) {
+//		std::cout << it->first << std::endl;
+//	}
+//
+//	ft::map<int, char>::const_iterator cit = my_map.begin();
+//	for (; cit != my_map.end(); cit++) {
+//		std::cout << cit->first << std::endl;
+//	}
 
-	std::cout << "####################" << std::endl;
+//	std::cout << "####################" << std::endl;
+//
+//	it = my_map.begin();
+//
+//	for (; it != my_map.end();) {
+//		my_map.erase(it++);
+//		my_map.print_tree();
+//		std::cout << "############################################" << std::endl;
+//	}
 
-	it = my_map.begin();
 
-	for (; it != my_map.end();) {
-		my_map.erase(it++);
-		my_map.print_tree();
-		std::cout << "############################################" << std::endl;
-	}
-
-
-	//TODO: DEBUG NEEDED !
 //	ft::map<int, char>::reverse_iterator rit = my_map.rbegin();
 //	for (; rit != my_map.rend(); rit++) {
 //		std::cout << rit->first << std::endl;
 //	}
-//
-//	my_map.clear();
-//
-//	std::cout << "size: " << my_map.size() << std::endl;
-//	my_map.print_tree();
-//
-//	it = my_map.begin();
-//	for (; it != my_map.end(); it++) {
-//		std::cout << it->first << std::endl;
-//	}
+
+	ft::map<int, char>::const_reverse_iterator crit = my_map.rbegin();
+	for (; crit != my_map.rend(); crit++) {
+		std::cout << crit->first << std::endl;
+	}
+
 
 	return 0;
 }

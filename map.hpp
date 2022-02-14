@@ -202,16 +202,16 @@ template <class Key, class T> class BSTNode {
 
 };
 
-template <class T> class MapIterator : public ft::iterator<ft::bidirectional_iterator_tag, T> {
+template <class T> class MapIterator : public ft::iterator<std::bidirectional_iterator_tag, T> {
 
 	public:
-		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::iterator_category
+		typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::iterator_category
 				iterator_category;
-		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::difference_type
+		typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::difference_type
 				difference_type;
-		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::value_type value_type;
-		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer pointer;
-		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference reference;
+		typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::value_type value_type;
+		typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::pointer pointer;
+		typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::reference reference;
 		typedef typename value_type::first_type key_type;
 		typedef typename value_type::second_type mapped_type;
 		typedef ft::BSTNode<key_type, mapped_type> node;
@@ -269,8 +269,6 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 			return MapIterator<T>(tmp);
 		}
 
-		//TODO: There is a problem when we do -- on the past last elem ! And conversely !
-
 		MapIterator & operator--() {
 			_next_node = _node;
 			if (!_node) { _node = _prev_node; }
@@ -287,7 +285,7 @@ template <class T> class MapIterator : public ft::iterator<ft::bidirectional_ite
 		}
 
 		operator MapIterator<const T>() const {
-			return (MapIterator<const T>(_node));
+			return MapIterator<const T>(_node);
 		}
 
 		template <typename T1, typename T2>
@@ -402,26 +400,20 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return const_iterator(NULL);
 		}
 
-		//TODO: Reverse iterators don't work :(
-
 		reverse_iterator rbegin() {
-			if (_root) { return reverse_iterator(iterator(_root->find_max())); }
-			return reverse_iterator(NULL);
+			return end();
 		}
 
 		const_reverse_iterator rbegin() const {
-			if (_root) { return const_reverse_iterator(const_iterator(_root->find_max())); }
-			return const_reverse_iterator(NULL);
+			return end();
 		}
 
 		reverse_iterator rend() {
-			if (_root) { return reverse_iterator(--iterator(_root->find_min())); }
-			return reverse_iterator(NULL);
+			return begin();
 		}
 
 		const_reverse_iterator rend() const {
-			if (_root) { return const_reverse_iterator(--const_iterator(_root->find_min())); }
-			return const_reverse_iterator(NULL);
+			return begin();
 		}
 
 		// Capacity
@@ -627,14 +619,49 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return const_iterator(tmp);
 		}
 
-		//TODO: std::pair<iterator,iterator> equal_range( const Key& key );
-		//TODO: std::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
+		iterator lower_bound(const Key & key) {
+			_node_type * tmp = _root;
 
-		//TODO: iterator lower_bound( const Key& key );
-		//TODO: const_iterator lower_bound( const Key& key ) const;
+			while (tmp && _comp(tmp->get_pair().first, key)) {
+				tmp = tmp->get_next();
+			}
+			return iterator(tmp);
+		}
 
-		//TODO: iterator upper_bound( const Key& key );
-		//TODO: const_iterator upper_bound( const Key& key ) const;
+		const_iterator lower_bound(const Key & key) const {
+			_node_type * tmp = _root;
+
+			while (tmp && _comp(tmp->get_pair().first, key)) {
+				tmp = tmp->get_next();
+			}
+			return const_iterator(tmp);
+		}
+
+		iterator upper_bound(const Key & key) {
+			_node_type * tmp = _root;
+
+			while (tmp && !_comp(key, tmp->get_pair().first)) {
+				tmp = tmp->get_next();
+			}
+			return iterator(tmp);
+		}
+
+		const_iterator upper_bound(const Key & key) const {
+			_node_type * tmp = _root;
+
+			while (tmp && !_comp(key, tmp->get_pair().first)) {
+				tmp = tmp->get_next();
+			}
+			return const_iterator(tmp);
+		}
+
+		ft::pair<iterator, iterator> equal_range(const Key & key) {
+			return make_pair(lower_bound(key), upper_bound(key));
+		}
+
+		ft::pair<const_iterator, const_iterator> equal_range(const Key & key) const {
+			return make_pair(lower_bound(key), upper_bound(key));
+		}
 
 		//TODO: DEBUG to remove
 		void print_tree() const {
@@ -671,6 +698,37 @@ template <class Key, class T, class Compare = std::less<Key>,
 template <class Key, class T, class Compare, class Alloc>
 void swap(map<Key, T, Compare, Alloc> & lhs, map<Key, T, Compare, Alloc> & rhs) {
 	lhs.swap(rhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool operator==(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
+	if (lhs.size() != rhs.size()) { return false; }
+	return equal(lhs.begin(), lhs.end(), rhs.begin());
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool operator!=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
+	return !(lhs == rhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool operator<(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
+	return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool operator<=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
+	return !(rhs < lhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool operator>(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
+	return rhs < lhs;
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool operator>=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
+	return !(lhs < rhs);
 }
 
 }
