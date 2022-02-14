@@ -409,7 +409,9 @@ int main() {
 //		std::cout << rit->first << std::endl;
 //	}
 
-	ft::map<int, char>::const_reverse_iterator crit = my_map.rbegin();
+	ft::map<int, char>::reverse_iterator itest(my_map.rbegin());
+
+	ft::map<int, char>::const_reverse_iterator crit(my_map.rbegin());
 	for (; crit != my_map.rend(); crit++) {
 		std::cout << crit->first << std::endl;
 	}

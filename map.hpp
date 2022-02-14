@@ -220,7 +220,9 @@ template <class T> class MapIterator : public ft::iterator<std::bidirectional_it
 
 		MapIterator() : _node(NULL), _prev_node(NULL), _next_node(NULL) {}
 
-		MapIterator(node_pointer node) : _node(node), _prev_node(NULL), _next_node(NULL) {}
+		MapIterator(node_pointer node, node_pointer prev_node = NULL,
+					node_pointer next_node = NULL) :
+				_node(node), _prev_node(prev_node), _next_node(next_node) {}
 
 		MapIterator(const MapIterator & original) :
 				_node(original._node), _prev_node(original._prev_node),
@@ -285,7 +287,7 @@ template <class T> class MapIterator : public ft::iterator<std::bidirectional_it
 		}
 
 		operator MapIterator<const T>() const {
-			return MapIterator<const T>(_node);
+			return MapIterator<const T>(_node, _prev_node, _next_node);
 		}
 
 		template <typename T1, typename T2>
@@ -401,19 +403,23 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		reverse_iterator rbegin() {
-			return end();
+			if (_root) { return reverse_iterator(++iterator(_root->find_max())); }
+			return reverse_iterator(iterator(NULL));
 		}
 
 		const_reverse_iterator rbegin() const {
-			return end();
+			if (_root) { return const_reverse_iterator(++const_iterator(_root->find_max())); }
+			return const_reverse_iterator(const_iterator(NULL));
 		}
 
 		reverse_iterator rend() {
-			return begin();
+			if (_root) { return reverse_iterator(iterator(_root->find_min())); }
+			return reverse_iterator(iterator(NULL));
 		}
 
 		const_reverse_iterator rend() const {
-			return begin();
+			if (_root) { return const_reverse_iterator(const_iterator(_root->find_min())); }
+			return const_reverse_iterator(const_iterator(NULL));
 		}
 
 		// Capacity
