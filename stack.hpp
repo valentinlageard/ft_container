@@ -5,9 +5,6 @@
 #include <cstddef>
 #include "vector.hpp"
 
-// DEBUG
-#include <deque>
-
 
 namespace ft {
 
@@ -21,7 +18,7 @@ template <class T, class Container = ft::vector<T> > class stack {
 		typedef typename container_type::const_reference const_reference;
 		typedef size_t size_type;
 
-		explicit stack(const container_type & ctnr = container_type()) : c(ctnr) {}
+		stack(const container_type & ctnr = container_type()) : c(ctnr) {}
 
 		~stack() {}
 
@@ -59,17 +56,29 @@ template <class T, class Container = ft::vector<T> > class stack {
 		// Need to use friend for relational operator overload so they can access protected member c
 		// without exposing it.
 
-		friend bool operator==(const stack<T, Container> & lhs, const stack<T, Container> & rhs);
+		template <class T_x, class Container_x>
+		friend bool operator==(const stack<T_x, Container_x> & lhs,
+							   const stack<T_x, Container_x> & rhs);
 
-		friend bool operator!=(const stack<T, Container> & lhs, const stack<T, Container> & rhs);
+		template <class T_x, class Container_x>
+		friend bool operator!=(const stack<T_x, Container_x> & lhs,
+							   const stack<T_x, Container_x> & rhs);
 
-		friend bool operator<(const stack<T, Container> & lhs, const stack<T, Container> & rhs);
+		template <class T_x, class Container_x>
+		friend bool operator<=(const stack<T_x, Container_x> & lhs,
+							   const stack<T_x, Container_x> & rhs);
 
-		friend bool operator<=(const stack<T, Container> & lhs, const stack<T, Container> & rhs);
+		template <class T_x, class Container_x>
+		friend bool operator<(const stack<T_x, Container_x> & lhs,
+							  const stack<T_x, Container_x> & rhs);
 
-		friend bool operator>(const stack<T, Container> & lhs, const stack<T, Container> & rhs);
+		template <class T_x, class Container_x>
+		friend bool operator>(const stack<T_x, Container_x> & lhs,
+							  const stack<T_x, Container_x> & rhs);
 
-		friend bool operator>=(const stack<T, Container> & lhs, const stack<T, Container> & rhs);
+		template <class T_x, class Container_x>
+		friend bool operator>=(const stack<T_x, Container_x> & lhs,
+							   const stack<T_x, Container_x> & rhs);
 
 	protected:
 		container_type c;

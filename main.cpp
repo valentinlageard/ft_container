@@ -6,8 +6,10 @@
 #include <cstdlib>
 
 
-#ifndef NS
-#define NS ft
+#ifndef STL
+# define NS ft
+#else
+# define NS std
 #endif
 
 template <class T> void print_vector(NS::vector<T> & v) {

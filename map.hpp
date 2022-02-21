@@ -364,7 +364,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 		map(const map & other) :
 				_root(NULL), _alloc(other._alloc), _node_alloc(other._node_alloc),
 				_comp(other._comp) {
-			insert(other.begin(), other.end());
+			_root = _copy(other._root);
 		}
 
 		map & operator=(const map & other) {
@@ -372,7 +372,7 @@ template <class Key, class T, class Compare = std::less<Key>,
 				return *this;
 			}
 			clear();
-			insert(other.begin(), other.end());
+			_root = _copy(other._root);
 			return *this;
 		}
 
@@ -685,6 +685,18 @@ template <class Key, class T, class Compare = std::less<Key>,
 		allocator_type _alloc;
 		_node_allocator_type _node_alloc;
 		key_compare _comp;
+
+		_node_type * _copy(_node_type * root, _node_type * parent = NULL) {
+			if (root == NULL) { return NULL; }
+			else {
+				_node_type * new_node = _node_alloc.allocate(1);
+				_node_alloc.construct(new_node, root->get_pair());
+				new_node->set_parent(parent);
+				new_node->set_left(_copy(root->get_left(), new_node));
+				new_node->set_right(_copy(root->get_right(), new_node));
+				return new_node;
+			}
+		}
 
 		void _subtree_shift(_node_type * node1, _node_type * node2) {
 			if (!node1->get_parent()) {
