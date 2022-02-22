@@ -6,6 +6,9 @@
 #include "type_traits.hpp"
 #include "utility.hpp"
 
+//DEBUG PURPOSES
+#include <iostream>
+
 
 namespace ft {
 
@@ -153,43 +156,43 @@ template <class Key, class T> class BSTNode {
 			return right_subcount + left_subcount + 1;
 		}
 
-		void print_subtree() {
-			std::cout << _pair.first << ": " << _pair.second << std::endl;
-			if (_right) {
-				_right->_recursive_print("", false);
-			} else {
-				std::cout << "" << "├R─> NULL" << std::endl;
-			}
-			if (_left) {
-				_left->_recursive_print("", true);
-			} else {
-				std::cout << "" << "└L─> NULL" << std::endl;
-			}
-		}
-
-		void _recursive_print(std::string indent = "", bool is_left = false) {
-			if (!is_left) {
-				std::cout << indent << "├R─> " << _pair.first << ": " << _pair.second;
-				std::cout << " (parent key: " << (_parent ? _parent->_pair.first : 0) << ")"
-						  << std::endl;
-				indent = indent.append("|	");
-			} else {
-				std::cout << indent << "└L─> " << _pair.first << ": " << _pair.second;
-				std::cout << " (parent key: " << (_parent ? _parent->_pair.first : 0) << ")"
-						  << std::endl;
-				indent = indent.append("	 ");
-			}
-			if (_right) {
-				_right->_recursive_print(indent, false);
-			} else {
-				std::cout << indent << "├R─> NULL" << std::endl;
-			}
-			if (_left) {
-				_left->_recursive_print(indent, true);
-			} else {
-				std::cout << indent << "└L─> NULL" << std::endl;
-			}
-		}
+//		void print_subtree() {
+//			std::cout << _pair.first << ": " << _pair.second << std::endl;
+//			if (_right) {
+//				_right->_recursive_print("", false);
+//			} else {
+//				std::cout << "" << "├R─> NULL" << std::endl;
+//			}
+//			if (_left) {
+//				_left->_recursive_print("", true);
+//			} else {
+//				std::cout << "" << "└L─> NULL" << std::endl;
+//			}
+//		}
+//
+//		void _recursive_print(std::string indent = "", bool is_left = false) {
+//			if (!is_left) {
+//				std::cout << indent << "├R─> " << _pair.first << ": " << _pair.second;
+//				std::cout << " (parent key: " << (_parent ? _parent->_pair.first : 0) << ")"
+//						  << std::endl;
+//				indent = indent.append("|	");
+//			} else {
+//				std::cout << indent << "└L─> " << _pair.first << ": " << _pair.second;
+//				std::cout << " (parent key: " << (_parent ? _parent->_pair.first : 0) << ")"
+//						  << std::endl;
+//				indent = indent.append("	 ");
+//			}
+//			if (_right) {
+//				_right->_recursive_print(indent, false);
+//			} else {
+//				std::cout << indent << "├R─> NULL" << std::endl;
+//			}
+//			if (_left) {
+//				_left->_recursive_print(indent, true);
+//			} else {
+//				std::cout << indent << "└L─> NULL" << std::endl;
+//			}
+//		}
 
 	private:
 
@@ -669,12 +672,11 @@ template <class Key, class T, class Compare = std::less<Key>,
 			return make_pair(lower_bound(key), upper_bound(key));
 		}
 
-		//TODO: DEBUG to remove
-		void print_tree() const {
-			if (_root) {
-				_root->print_subtree();
-			}
-		}
+//		void print_tree() const {
+//			if (_root) {
+//				_root->print_subtree();
+//			}
+//		}
 
 	private:
 		typedef BSTNode<const key_type, mapped_type> _node_type;

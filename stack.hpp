@@ -53,9 +53,6 @@ template <class T, class Container = ft::vector<T> > class stack {
 			c.pop_back();
 		}
 
-		// Need to use friend for relational operator overload so they can access protected member c
-		// without exposing it.
-
 		template <class T_x, class Container_x>
 		friend bool operator==(const stack<T_x, Container_x> & lhs,
 							   const stack<T_x, Container_x> & rhs);
