@@ -665,11 +665,11 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		ft::pair<iterator, iterator> equal_range(const Key & key) {
-			return make_pair(lower_bound(key), upper_bound(key));
+			return ft::make_pair(lower_bound(key), upper_bound(key));
 		}
 
 		ft::pair<const_iterator, const_iterator> equal_range(const Key & key) const {
-			return make_pair(lower_bound(key), upper_bound(key));
+			return ft::make_pair(lower_bound(key), upper_bound(key));
 		}
 
 //		void print_tree() const {
