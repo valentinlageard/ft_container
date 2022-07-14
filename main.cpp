@@ -6,13 +6,14 @@
 #include <deque>
 
 
-#if NS == 1
-namespace ft = std;
+#if 1 //CREATE A REAL STL EXAMPLE
 
 #include <map>
 #include <stack>
 #include <vector>
 
+
+namespace ft = std;
 
 #else
 
@@ -548,6 +549,14 @@ void test_map() {
 	assert(my_map != my_map2);
 	assert(my_map2 == my_map3);
 	assert(my_map > my_map2);
+
+	std::cout << "---------- TESTING BOUNDS ----------" << std::endl;
+	std::cout << my_map.upper_bound(5)->first << std::endl;
+	std::cout << my_map.lower_bound(5)->first << std::endl;
+	std::cout << my_map2.upper_bound(5)->first << std::endl;
+	std::cout << my_map2.lower_bound(5)->first << std::endl;
+	std::cout << my_map3.upper_bound(5)->first << std::endl;
+	std::cout << my_map3.lower_bound(5)->first << std::endl;
 }
 
 void test_stack() {

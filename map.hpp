@@ -1,6 +1,11 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
+#include <memory>
+#include <functional>
+#include <string>
+#include <stdexcept>
+
 #include "algorithm.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
@@ -155,6 +160,8 @@ template <class Key, class T> class BSTNode {
 			}
 			return right_subcount + left_subcount + 1;
 		}
+
+//		DEBUG PURPOSES
 
 //		void print_subtree() {
 //			std::cout << _pair.first << ": " << _pair.second << std::endl;
@@ -456,11 +463,17 @@ template <class Key, class T, class Compare = std::less<Key>,
 				std::string exception_ss = "vector::at: key is out of range";
 				throw std::out_of_range(exception_ss);
 			}
-			return *it->second;
+			return it->second;
 		}
 
 		const T & at(const Key & key) const {
-			return at(key);
+			const_iterator cit = find(key);
+
+			if (cit == end()) {
+				std::string exception_ss = "vector::at: key is out of range";
+				throw std::out_of_range(exception_ss);
+			}
+			return cit->second;
 		}
 
 		// Modifiers
@@ -629,39 +642,39 @@ template <class Key, class T, class Compare = std::less<Key>,
 		}
 
 		iterator lower_bound(const Key & key) {
-			_node_type * tmp = _root;
+			iterator tmp = begin();
 
-			while (tmp && _comp(tmp->get_pair().first, key)) {
-				tmp = tmp->get_next();
+			while (tmp != end() && _comp(tmp->first, key)) {
+				++tmp;
 			}
-			return iterator(tmp);
+			return tmp;
 		}
 
 		const_iterator lower_bound(const Key & key) const {
-			_node_type * tmp = _root;
+			const_iterator tmp = begin();
 
-			while (tmp && _comp(tmp->get_pair().first, key)) {
-				tmp = tmp->get_next();
+			while (tmp != end() && _comp(tmp->first, key)) {
+				++tmp;
 			}
 			return const_iterator(tmp);
 		}
 
 		iterator upper_bound(const Key & key) {
-			_node_type * tmp = _root;
+			iterator tmp = begin();
 
-			while (tmp && !_comp(key, tmp->get_pair().first)) {
-				tmp = tmp->get_next();
+			while (tmp != end() && !_comp(key, tmp->first)) {
+				++tmp;
 			}
-			return iterator(tmp);
+			return tmp;
 		}
 
 		const_iterator upper_bound(const Key & key) const {
-			_node_type * tmp = _root;
+			const_iterator tmp = begin();
 
-			while (tmp && !_comp(key, tmp->get_pair().first)) {
-				tmp = tmp->get_next();
+			while (tmp != end() && !_comp(key, tmp->first)) {
+				++tmp;
 			}
-			return const_iterator(tmp);
+			return tmp;
 		}
 
 		ft::pair<iterator, iterator> equal_range(const Key & key) {
@@ -671,6 +684,14 @@ template <class Key, class T, class Compare = std::less<Key>,
 		ft::pair<const_iterator, const_iterator> equal_range(const Key & key) const {
 			return ft::make_pair(lower_bound(key), upper_bound(key));
 		}
+
+		// Allocator
+
+		allocator_type get_allocator() const {
+			return allocator_type(_alloc);
+		}
+
+//		DEBUG PURPOSES
 
 //		void print_tree() const {
 //			if (_root) {
@@ -723,7 +744,7 @@ void swap(map<Key, T, Compare, Alloc> & lhs, map<Key, T, Compare, Alloc> & rhs) 
 template <class Key, class T, class Compare, class Alloc>
 bool operator==(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
 	if (lhs.size() != rhs.size()) { return false; }
-	return equal(lhs.begin(), lhs.end(), rhs.begin());
+	return ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 template <class Key, class T, class Compare, class Alloc>
@@ -733,7 +754,7 @@ bool operator!=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compa
 
 template <class Key, class T, class Compare, class Alloc>
 bool operator<(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs) {
-	return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 template <class Key, class T, class Compare, class Alloc>
