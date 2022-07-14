@@ -50,11 +50,7 @@ template <> struct is_integral_base<const unsigned int> : true_type {};
 template <> struct is_integral_base<const unsigned long int> : true_type {};
 template <> struct is_integral_base<const unsigned long long int> : true_type {};
 
-// TODO : template<typename T> struct is_integral: is_integral_base<std::remove_cv_t<T>> {};
-
 template <typename T> struct is_integral : is_integral_base<T> {};
-
-// TODO : remove_cv
 
 template <class T> struct remove_const {
 	typedef T type;

@@ -5,6 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <sstream>
+#include <typeinfo>
 #include "algorithm.hpp"
 #include "iterator.hpp"
 #include "type_traits.hpp"
@@ -16,10 +17,6 @@
 namespace ft {
 
 template <class T, class Alloc = std::allocator<T> > class vector {
-
-		// TODO: Check for max_size when allocating new elements
-		// TODO: Check for allocation error when allocating elements
-		// TODO: Check if NULL _array causes no bug ?
 
 	public:
 
@@ -232,22 +229,32 @@ template <class T, class Alloc = std::allocator<T> > class vector {
 		template <typename InputIterator>
 		void assign(InputIterator first, InputIterator last,
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type * = 0) {
-			std::cout << *first << std::endl;
-			// TODO: distance "consumes" the iterator which makes the algo segfault when using a istreambuffer
+			if (typeid(typename iterator_traits<InputIterator>::iterator_category) ==
+				typeid(std::input_iterator_tag)) {
+				clear();
+				size_type i = 0;
+				while (first != last) {
+					if (i >= capacity()) {
+						reserve(capacity() * 2 + 1);
+					}
+					_alloc.construct(_array + i, *first);
+					++first;
+					++i;
+					++_size;
+				}
+				return;
+			}
 			difference_type new_size = ft::distance(first, last);
-			std::cout << new_size << std::endl;
 			clear();
 			reserve(new_size);
-			std::cout << "size:" << size() << "; capacity: " << capacity() << std::endl;
 			for (difference_type i = 0; i < new_size; ++i) {
-				std::cout << "there" << i << std::endl;
 				value_type val = *first;
-				std::cout << val << std::endl;
 				_alloc.construct(_array + i, val);
 				first++;
 			}
 			_size = new_size;
 		}
+
 
 		void push_back(const value_type & val) {
 			if (_size == _capacity) {
@@ -256,6 +263,7 @@ template <class T, class Alloc = std::allocator<T> > class vector {
 			_alloc.construct(_array + _size, val);
 			_size++;
 		}
+
 
 		void pop_back() {
 			_alloc.destroy(_array + _size - 1);
@@ -309,14 +317,18 @@ template <class T, class Alloc = std::allocator<T> > class vector {
 		template <class InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last,
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type * = 0) {
+			if (typeid(typename iterator_traits<InputIterator>::iterator_category) ==
+				typeid(std::input_iterator_tag)) {
+				while (first != last) {
+					position = insert(position, *first);
+					++first;
+					++position;
+				}
+				return;
+			}
 			pointer new_array;
 			size_type pos_idx = position - begin();
-			size_type n = 0;
-			InputIterator tmp(first);
-			while (tmp != last) {
-				n++;
-				tmp++;
-			}
+			size_type n = ft::distance(first, last);
 
 			if (_size + n > _capacity) {
 				new_array = _alloc.allocate(_capacity + (n * 2) + 1);
