@@ -1,6 +1,8 @@
+#!/bin/bash
+
 echo "Compiling...";
-c++ -v -Wall -Werror -Wextra -std=c++98 main.cpp -o test_ft;
-c++ -v -Wall -Werror -Wextra -std=c++98 main.cpp -o test_stl;
+c++ -Wall -Werror -Wextra -std=c++98 main_ft.cpp -o test_ft;
+c++ -Wall -Werror -Wextra -std=c++98 main_stl.cpp -o test_stl;
 echo "Done.";
 echo "Running for diff...";
 ./test_ft 123456 > test_ft.output;
